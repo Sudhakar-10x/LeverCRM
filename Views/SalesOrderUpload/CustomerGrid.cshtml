@@ -1,0 +1,140 @@
+﻿
+
+<style>
+    .table {
+        min-width: 540px;
+    }
+</style>
+
+<input type="text" id="customerSearchBox" class="form-control" placeholder="Search by Name or Code (min 4 chars)" />
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover" id="customerTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    var customerTable;
+
+    function loadCustomerTable(query) {
+        const customerTypeVal = $('input[name="entity.CallType"]:checked').val();
+
+        $.ajax({
+            url: '@Url.Action("GetCustomerList", "SalesOrder")',
+            type: 'GET',
+            data: {
+                searchTerm: query,
+                customertype: customerTypeVal,
+                _: new Date().getTime() // Prevents caching
+            },
+            success: function (response) {
+                const data = response.data || response; // Handles both { data: [] } and []
+
+                if ($.fn.DataTable.isDataTable('#customerTable')) {
+                    customerTable.clear().rows.add(data).draw();
+                } else {
+                    customerTable = $('#customerTable').DataTable({
+                        searching: false,
+                        lengthChange: false,
+                        paging: true,
+                        data: data,
+                        columns: [
+                            { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                            { data: "Name" },
+                            { data: "CustomerID" },
+                            /*{ data: "EmailID" },*/
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    return `<button class='btn btn-sm btn-primary select-customer'
+                                        data-code='${row.CustomerID}'
+                                        data-id='${row.CustomerID}'
+                                        data-name='${row.Name}'>Select</button>`;
+                                },
+                                className: "text-center"
+                            }
+                        ]
+                    });
+                }
+            },
+            error: function () {
+                alert('Failed to load customer data.');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('#customerSearchBox').on('keyup', function () {
+            const query = $(this).val().trim();
+            if (query.length >= 4) {
+                loadCustomerTable(query);
+            } else if (customerTable) {
+                customerTable.clear().draw();
+            }
+        });
+
+        $('#customerTable').on('click', '.select-customer', function () {
+            const customerID = $(this).data("id");
+            const customerName = $(this).data("name");
+
+            $('#CardCode').val(customerID);
+            $('#CardName').val(customerName);
+
+            setTimeout(() => {
+                $('#customerlist-form-modal').modal('hide');
+            }, 100);
+
+            //loadAddresses(customerID);
+            if (typeof onCustomerSelected === "function") {
+                onCustomerSelected(customerID);
+            }
+        });
+
+        $('#customerlist-form-modal').on('shown.bs.modal', function () {
+            $('#customerSearchBox').val('');
+
+            if ($.fn.DataTable.isDataTable('#customerTable')) {
+                customerTable.clear().draw();
+            } else {
+                customerTable = $('#customerTable').DataTable({
+                    searching: false,
+                    lengthChange: false,
+                    paging: true,
+                    data: [],
+                    columns: [
+                        { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                        { data: "Name" },
+                        { data: "PhoneNo" },
+                        { data: "EmailID" },
+                        {
+                            data: null,
+                            render: function (data, type, row) {
+                                return `<button class='btn btn-sm btn-primary select-customer'
+                                    data-code='${row.CustomerID}'
+                                    data-id='${row.CustomerID}'
+                                    data-name='${row.Name}'>Select</button>`;
+                            },
+                            className: "text-center"
+                        }
+                    ]
+                });
+            }
+        });
+
+        $('#customerlist-form-modal').on('hidden.bs.modal', function () {
+            $('#customerSearchBox').val('');
+            if (customerTable) {
+                customerTable.clear().draw();
+            }
+        });
+    });
+</script>

@@ -1,0 +1,290 @@
+﻿@using _10xErp.Models
+@model _10xErp.Models.CustomerModal
+@{
+    ViewBag.Title = "ViewCustomerDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Business Partner Master</h5>
+                    <div class="ibox-tools">
+                        <a href="@Url.Action("Index", "BusinessPartner")" class="btn btn-white btn-sm">Back to List</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    @using (Html.BeginForm("SaveBusinessPartner", "BusinessPartner", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CardCode, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.CardCode, new { @class = "form-control", @readonly = "readonly", @placeholder = "Code" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CardName, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.CardName, new { @class = "form-control", @readonly = "readonly", @placeholder = "Name" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CardType, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.CardType, new { @class = "form-control", @readonly = "readonly", @placeholder = "Type" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Balance, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.Balance, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CardFName, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.CardFName, new { @class = "form-control", @readonly = "readonly", @placeholder = "Reference Name" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.OrderBal, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.OrderBal, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 4 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CustGrp, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.CustGrp, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 5 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Currency, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.Currency, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 6 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.LicTradNum, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.LicTradNum, new { @class = "form-control", @readonly = "readonly", @placeholder = "Federal Tax Id" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <!-- Nav Tabs -->
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#tab-general">General</a></li>
+                            <li><a data-toggle="tab" href="#tab-contact">Contact Person</a></li>
+                            <li><a data-toggle="tab" href="#tab-bill">Bill To Address</a></li>
+                            <li><a data-toggle="tab" href="#tab-ship">Ship To Address</a></li>
+                            <li><a data-toggle="tab" href="#tab-payment">Payment Terms</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- General Tab -->
+                            <div id="tab-general" class="tab-pane active">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Phone1, "Tel 1", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.Phone1, new { @class = "form-control", @readonly = "readonly", @placeholder = "Tel 1" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Phone2, "Tel 2", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.Phone2, new { @class = "form-control", @readonly = "readonly", @placeholder = "Tel 2" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Cellular, "Mobile No", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.Cellular, new { @class = "form-control", @readonly = "readonly", @placeholder = "Mobile No" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Fax, "Fax", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.Fax, new { @class = "form-control", @readonly = "readonly", @placeholder = "Fax" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Email, "Email address", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = "readonly", @placeholder = "Email" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.BPStatus, "BP Status", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.BPStatus, new { @class = "form-control", @readonly = "readonly", @placeholder = "Status" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Territory, "Territory", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.Territory, new { @class = "form-control", @readonly = "readonly", @placeholder = "Territory" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.SalesEmp, "Sales Employee", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.SalesEmp, new { @class = "form-control", @readonly = "readonly", @placeholder = "Sales Employee" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div id="tab-payment" class="tab-pane">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PaymentTerms, "Payment Terms", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.PaymentTerms, new { @class = "form-control", @readonly = "readonly", @placeholder = "Payment Terms" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.Pricelist, "Price List", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.Pricelist, new { @class = "form-control", @readonly = "readonly", @placeholder = "Price List" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.CreditLimit, "Credit Limit", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.CreditLimit, new { @class = "form-control", @readonly = "readonly", @placeholder = "Credit Limit" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.DebtLimit, "Commitment Limit", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.DebtLimit, new { @class = "form-control", @readonly = "readonly", @placeholder = "Commitment Limit" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Other Tabs Placeholder -->
+                            <div id="tab-contact" class="tab-pane">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.ContactPerson, "Contact ID", new { @class = "col-sm-3 control-label" })
+                                            <div class="col-sm-9">
+                                                @Html.TextBoxFor(m => m.ContactPerson, new { @class = "form-control", @readonly = "readonly", @placeholder = "Contact ID" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tab-bill" class="tab-pane">
+                                <br />
+                                <!-- Bill To Address logic will go here, you can render a list or table dynamically -->
+
+                            </div>
+
+                            <div id="tab-ship" class="tab-pane">
+                                <br />
+                                <!-- Ship To Address logic will go here, you can render a list or table dynamically -->
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
