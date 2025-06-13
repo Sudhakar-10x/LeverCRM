@@ -1,0 +1,71 @@
+﻿
+@model _10xErp.Models.ItemDetails
+    @{
+        Layout = null;
+    }
+
+<tr class="row-address">    
+    <td>
+        <select class="form-control item-dropdown" name="ItemDetailsListView[@Model.Index].ItemCode" data-selected-value="@Model.ItemCode">
+            @if (!string.IsNullOrEmpty(Model.ItemCode))
+            {
+                <option value="@Model.ItemCode" selected="selected">@Model.ItemName</option>
+            }
+            else
+            {
+                <option value="">-- Select Item --</option>
+            }
+        </select>
+        <input type="hidden" name="ItemDetailsListView[@Model.Index].ItemName" value="@Model.ItemName" class="item-name" />
+    </td>
+    <td>
+        <input type="text" name="ItemDetailsListView[@Model.Index].ItemCode" readonly class="form-control form-control-sm" value="@Model.ItemCode" />
+        @Html.ValidationMessage($"ItemDetailsListView[{Model.Index}].ItemCode", "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="hidden" name="ItemDetailsListView[@Model.Index].UomEntry" value="@Model.UomEntry" class="UomEntry" />
+        <select name="ItemDetailsListView[@Model.Index].UomName" class="form-control uom-dropdown" readonly></select>
+    </td>
+    <td>
+        <input type="number" step="any" name="ItemDetailsListView[@Model.Index].Qty" class="form-control form-control-sm" value="@Model.Qty" />
+        @Html.ValidationMessage($"ItemDetailsListView[{Model.Index}].Qty", "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <select name="ItemDetailsListView[@Model.Index].foc" class="form-control foc-dropdown"></select>
+    </td>
+    <td>
+        <input type="text" name="ItemDetailsListView[@Model.Index].focremarks" class="form-control form-control-sm focremarks-textbox" readonly value="@Model.focremarks" />
+    </td>
+    <td>
+        <input type="number" step="any" name="ItemDetailsListView[@Model.Index].Price" class="form-control form-control-sm" value="@Model.Price" />
+        <input type="hidden" class="original-price" name="ItemDetailsListView[@Model.Index].OriginalPrice" value="@Model.OriginalPrice" />
+        @Html.ValidationMessage($"ItemDetailsListView[{Model.Index}].Price", "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="number" step="any" name="ItemDetailsListView[@Model.Index].DisPer" class="form-control form-control-sm" value="@Model.DisPer" />
+    </td>
+    <td>
+        <select name="ItemDetailsListView[@Model.Index].VatGrpCode" class="form-control vatgroup-dropdown"></select>
+    </td>
+    <td>
+        <input type="text" name="ItemDetailsListView[@Model.Index].VAT" class="form-control form-control-sm vat-textbox" readonly value="@Model.VAT" />
+    </td>
+    <td hidden>
+        <input type="number" step="any" name="ItemDetailsListView[@Model.Index].VatRate" class="form-control form-control-sm vat-textbox" readonly value="@Model.VatRate" />
+    </td>
+    <td>
+        <input type="text" name="ItemDetailsListView[@Model.Index].LineTotal" class="form-control form-control-sm" value="@Model.LineTotal" />
+    </td>
+    <td>
+        <select name="ItemDetailsListView[@Model.Index].Warehouse" class="form-control warehouse-dropdown"></select>
+    </td>
+    <td>
+        <input type="text" name="ItemDetailsListView[@Model.Index].WhInstockQty" class="form-control form-control-sm WhInstockQty-textbox" readonly value="@Model.WhInstockQty" />
+    </td>
+    <td style="text-align: center;">
+        <button type="button" class="btn btn-sm btn-danger delete-row">X</button>
+    </td>
+</tr>
+
+
+

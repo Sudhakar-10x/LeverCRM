@@ -1,0 +1,1170 @@
+﻿@model _10xErp.Models.PurchaseViewModel
+@{
+    ViewBag.Title = "Create Purchase Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+
+    .table-input {
+        width: 100%;
+        border: none;
+        background: transparent;
+    }
+
+        .table-input:focus {
+            outline: none;
+            background-color: #eef6ff;
+        }
+
+    .table-responsive-scroll {
+        max-height: 400px;
+        overflow-y: scroll; /* Always show scrollbar */
+    }
+
+    th, td {
+        min-width: 120px;
+    }
+
+        th:first-child, td:first-child {
+            min-width: 60px;
+        }
+
+        th:last-child, td:last-child {
+            min-width: 100px;
+        }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Purchase Order</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Html.BeginForm("Create", "Purchase", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Vendor</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" id="customerAutocomplete" class="form-control"
+                                               name="customerAutocomplete"
+                                               value="@(string.IsNullOrEmpty(Model?.CardName) ? "" : Model.CardName)"
+                                               placeholder="Start typing vendor name..." />
+
+                                        <input type="hidden" id="selectedCustomerId" name="CustomerID" value="@Model?.CardCode" />
+
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Vendor Code</label>
+                                    <div class="col-sm-9">
+                                        @Html.EditorFor(m => m.CardCode, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                                        @Html.ValidationMessageFor(m => m.CardCode, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Contact Person</label>
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(model => model.contactPerson, new List<SelectListItem>(), "", new { @id = "ContactPerson", @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Vendor Ref. No</label>
+                                    <div class="col-sm-9">
+                                        @Html.EditorFor(m => m.RefNo, new { htmlAttributes = new { @id = "LpoNo", @placeholder = "Reference" } })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Payment Terms</label>
+                                    <div class="col-sm-9">
+                                        @*@Html.DropDownListFor(model => model.Paymentterms, (IEnumerable<SelectListItem>)ViewBag.PaymentTermsList, "-- Select Payment Terms --", new { @class = "form-control select2" })*@
+                                        @Html.DropDownListFor(model => model.Paymentterms, (IEnumerable<SelectListItem>)ViewBag.PaymentTermsList, "-- Select Payment Terms --", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Ship To Code</label>
+                                    <div class="col-sm-9">
+                                        @*<select id="ShipToAddress" class="form-control"></select>*@
+                                        @Html.DropDownListFor(model => model.Shiptocode, new List<SelectListItem>(), "", new { @id = "ShipToAddress", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Series</label>
+                                    <div class="col-sm-5">
+                                        @Html.DropDownListFor(model => model.series, (IEnumerable<SelectListItem>)ViewBag.SeriesList, "", new { @id = "ddlSeries", @class = "form-control" })
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @Html.EditorFor(m => m.DocNum, new { htmlAttributes = new { @readonly = "readonly" } })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Posting Date</label>
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.postingdate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Delivery Date</label>
+                                    <dv class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.ReqDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                    </dv>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Quotation Date</label>
+                                    <div class="col-sm-9">
+                                        @Html.TextBoxFor(m => m.LPODate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Delivery Location</label>
+                                    <div class="col-sm-9">
+                                        @*@Html.EditorFor(m => m.deliveryLocation, new { htmlAttributes = new { @id = "deliveryLocation", @readonly = "readonly" } })*@
+                                        @*@Html.DropDownListFor(model => model.deliveryLocation, (IEnumerable<SelectListItem>)ViewBag.TerritoryList, "", new { @class = "form-control select2" })*@
+                                        @Html.DropDownListFor(model => model.deliveryLocation, (IEnumerable<SelectListItem>)ViewBag.TerritoryList, "", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Bill To Code</label>
+                                    <div class="col-sm-9">
+                                        @*<select id="BillToAddress" class="form-control"></select>*@
+                                        @Html.DropDownListFor(model => model.Billtocode, new List<SelectListItem>(), "", new { @id = "BillToAddress", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="itemContainer">
+                            @Html.Partial("~/Views/Shared/_ItemList.cshtml", @Model.ItemDetailsListView)
+                            @Html.ValidationMessageFor(m => m.ItemDetailsListView, "", new { @class = "text-danger" })
+                        </div>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Buyer</label>
+                                    <div class="col-sm-9">
+                                        @*@Html.DropDownListFor(model => model.Salesemp, (IEnumerable<SelectListItem>)ViewBag.SalesEmployeesList, "-- Select Sales Employee --", new { @class = "form-control select2" })*@
+                                        @Html.DropDownListFor(model => model.Salesemp, (IEnumerable<SelectListItem>)ViewBag.SalesEmployeesList, "-- Select Employee --", new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Remarks</label>
+                                    <div class="col-sm-9">
+                                        @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control", rows = 2 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label">Total Before Discount</label>
+                                    <div class="col-sm-7">
+                                        @*<input type="number" class="form-control" id="totalBeforeDiscount" readonly>*@
+                                        @Html.EditorFor(m => m.TotalBeforeDiscount, new { htmlAttributes = new {  @disabled = "true" } })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label">Total Discount %</label>
+                                    <div class="col-sm-7">
+                                        @*<input type="number" class="form-control" id="totalDiscount">*@
+                                        @Html.EditorFor(m => m.DocDiscount, new { htmlAttributes = new { @type = "number", step = "0.001",min="0",max="100" } })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label">Freight</label>
+                                    <div class="col-sm-7">
+                                        @*<input type="number" class="form-control" id="totalDiscount">*@
+                                        @Html.EditorFor(m => m.Freight, new { htmlAttributes = new { @type = "number", step = "0.001", min = "0",@disabled = "true" } })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label"><input type="checkbox" id="roundCheck" value="Yes"/> Rounding</label>
+                                    <div class="col-sm-7">
+                                        @*<input type="number" class="form-control" id="totalDiscount">*@
+                                        @Html.EditorFor(m => m.Rounding, new { htmlAttributes = new { @type = "number", step = "0.01",min="0", @disabled = "true" } })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label">Tax</label>
+                                    <div class="col-sm-7">
+                                        @*<input type="number" class="form-control" id="totalTax" readonly>*@
+                                        @Html.EditorFor(m => m.TotalTax, new { htmlAttributes = new { @disabled = "true" } })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label">Total</label>
+                                    <div class="col-sm-7">
+                                        @*<input type="number" class="form-control" id="grossTotal" step="any">*@
+                                        @Html.EditorFor(m => m.GrossTotal, new { htmlAttributes = new { @disabled = "true"} })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-12 text-right">
+                                        <button type="submit" class="btn btn-success">Generate Purchase Order</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="leadsearch-form-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customer List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="itemsearch-form-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Item</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script type="text/javascript">
+
+        
+                    // Initialize item dropdown with Select2 + AJAX
+function loadDropdown(dropdown, isInitialLoad = false) {
+    let selectedValue = dropdown.val();
+
+    dropdown.select2({
+    placeholder: "-- Select Item --",
+    minimumInputLength: 4,
+    allowClear: true,
+    ajax: {
+        url: '@Url.Action("SearchItems", "Purchase")',
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return { searchTerm: params.term };
+        },
+        processResults: function (data) {
+            return {
+                results: $.map(data, function (item) {
+                    return {
+                        id: item.Value,
+                        text: item.Text,
+                        customHtml: `<div><p>${item.Value + ' - ' + item.Text}</p></div>`
+                    };
+                })
+            };
+        },
+        cache: true
+    },
+    templateResult: function (item) {
+        if (item.loading) return item.text;
+        return $(item.customHtml);
+    },
+    templateSelection: function (item) {
+        return item.text;
+    }
+});
+
+
+
+    dropdown.on('select2:open', function () {
+        let searchBox = document.querySelector('.select2-container--open .select2-search__field');
+        if (searchBox) {
+            searchBox.focus();
+        }
+    });
+
+    if (isInitialLoad && selectedValue) {
+        $.ajax({
+            url:  '@Url.Action("GetItemName", "SalesOrder")',
+            data: { id: selectedValue },
+            success: function (item) {
+                if (item) {
+                    let option = new Option(item.Text, item.Value, true, true);
+                    dropdown.append(option).trigger('change');
+                }
+            }
+        });
+    }
+        }
+
+        function calculateGross() {
+            debugger;
+            var totalBeforeDiscount = parseFloat($('#TotalBeforeDiscount').val());
+            var discountPercent = parseFloat($("#DocDiscount").val());
+            var deducted = totalBeforeDiscount * (discountPercent / 100);
+            var rounding = 0;
+            if ($("#roundCheck").is(":checked")) {
+                rounding = parseFloat($('#Rounding').val());
+            }
+            var Freight = $('#Freight').val();
+            if (Freight === "") {
+                Freight = 0; // Or whatever default you prefer
+            } else {
+                Freight = parseFloat(freightValue); // Convert to number if it has a value
+            }
+
+            var Total = totalBeforeDiscount - deducted + rounding + Freight;
+            $('#GrossTotal').val(Total.toFixed(3));
+        }
+        $("#DocDiscount").keyup(function () {
+            debugger
+            if ($("#DocDiscount").val() == '') $("#DocDiscount").val('0');
+            var discountPercent = parseFloat($("#DocDiscount").val());
+            if (discountPercent > 100) {
+                alert("Discount Cannot be greater than 100");
+                $("#DocDiscount").val('')
+            }
+            else {
+                var totalBeforeDiscount = $('#TotalBeforeDiscount').val();
+                var deducted = totalBeforeDiscount * (discountPercent / 100);
+                var finalAmount = totalBeforeDiscount - deducted;
+                //$('#GrossTotal').val(finalAmount.toFixed(3));
+                calculateGross();
+            }
+
+        });
+
+        $("#roundCheck").click(function () {
+            if ($("#roundCheck").is(":checked")) {
+                $('#Rounding').removeAttr("disabled");
+                $('#Rounding').val(0);
+                calculateGross();
+            }
+            else {
+                $('#Rounding').attr("disabled", "true");
+                $('#Rounding').val(0);
+                calculateGross();
+            }
+        });
+
+        $('#Rounding').keyup(function () {
+            var roundingValue = parseFloat($('#Rounding').val());
+            var Total = parseFloat($('#GrossTotal').val()) + roundingValue;
+            //$('#GrossTotal').val(Total);
+            calculateGross();
+        });
+
+
+        let selectedRowIndex = -1;
+
+        $(document).on('click', '.select-item2', function () {
+            selectedRowIndex = $(this).data('rowindex');
+            $.ajax({
+                url:  '@Url.Action("ItemSearchGrid", "SalesOrder")',
+                type: 'GET',
+                success: function (res) {
+                    $('#itemsearch-form-modal .modal-body').html(res);
+                    $('#itemsearch-form-modal').modal('show');
+                },
+                error: function () {
+                    alert("Failed to load item data.");
+                }
+            });
+        });
+
+
+        // Callback when item selected from modal
+        //function onItemSelected(item) {
+        //    let row = $('#tbladdress tbody tr').eq(selectedRowIndex);
+        //    row.find('.item-name').val(item.ItemName);
+        //    row.find('input[name$=".ItemCode"]').val(item.ItemCode);
+        //    row.find('input[name$=".Uom"]').val(item.Uom);
+        //    row.find('input[name$=".UnitPrice"]').val(item.Price);
+        //    row.find('input[name$=".Vat"]').val(item.VAT);
+        //    row.find('input[name$=".Qty"]').val(1); // default 1
+        //    row.find('input[name$=".Total"]').val((item.Price + item.VAT).toFixed(2));
+
+        //    $('#itemsearch-form-modal').modal('hide');
+        //}
+
+        $("#customerAutocomplete").autocomplete({
+    source: function (request, response) {
+        $.ajax({
+            url: '@Url.Action("GetCustomerListForDropDown", "Purchase")',
+            type: 'GET',
+            data: { customertype: 'S', searchTerm: $('#customerAutocomplete').val() },
+            success: function (data) {
+                response(data);
+            },
+            error: function () {
+                alert('Failed to load customer list.');
+            }
+        });
+    },
+    select: function (event, ui) {
+        $("#selectedCustomerId").val(ui.item.id);
+        onCustomerSelected(ui.item);
+        localStorage.setItem("selectedCustomerId", ui.item.id);
+        localStorage.setItem("selectedCustomerName", ui.item.value);
+    }
+    });
+
+        $(document).on('click', '.select-item', function () {
+            selectedRowIndex = $(this).data('rowindex');
+
+            $.ajax({
+                url:  '@Url.Action("ItemGrid", "Purchase")',
+                type: 'GET',
+                success: function (res) {
+                    $('#itemsearch-form-modal .modal-body').html(res);
+                    $('#itemsearch-form-modal').modal('show');
+                },
+                error: function () {
+                    alert("Failed to load item data.");
+                }
+            });
+        });
+
+
+
+        $('#btnSelectCustomer').on('click', function () {
+                    const customerType = 'C'; // $('input[name="entity.CallType"]:checked').val(); // or any other relevant ID
+            const baseUrl = '@Url.Action("CustomerGrid", "Purchase")'; // Update with your actual action/controller
+            const title = "Select Customer";
+
+            showSearchInPopup(baseUrl, title, customerType);
+        });
+
+        showSearchInPopup1 = (baseUrl, title, customerType) => {
+
+            let url = baseUrl + "?customerType=" + encodeURIComponent(customerType); // Append customerID to URL
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function (res) {
+                    $('#customerlist-form-modal .modal-body').html(res);
+
+                    if (!$('#customerlist-form-modal').hasClass('show')) {
+                        $('#customerlist-form-modal').modal('show');
+                    }
+                },
+                error: function () {
+                    alert("Failed to load data.");
+                }
+            });
+
+
+        };
+
+
+
+
+        // Remove the row when the trash icon is clicked
+        $(document).on("click", ".delete-row", function () {
+            $(this).closest("tr").remove();
+        });
+
+
+
+        $('.cancel-button').on('click', function () {
+            // Hide only the current modal (inner modal)
+            $(this).closest('.modal').modal('hide');
+        });
+
+        $(document).on('click', '#addRow', function () {
+            var indx = $('#tbladdress tbody tr').length;
+
+            selectedRowIndex = indx;
+
+            $.ajax({
+                url: "@Url.Action("GetNewItemRow", "Purchase")" + "/" + indx,
+                method: 'GET',
+                success: function (response) {
+                    response = response
+        .replace(/<\s*html[^>]*>/gi, '')
+        .replace(/<\s*\/\s*html\s*>/gi, '')
+        .replace(/<\s*body[^>]*>/gi, '')
+        .replace(/<\s*\/\s*body\s*>/gi, '')
+        .replace(/<\s*head[^>]*>[\s\S]*?<\s*\/\s*head\s*>/gi, '');
+                    $('#tbladdress tbody').append(response);
+                    setTimeout(function () {
+    var newDropdown = $('.item-dropdown').last(); // find the last added dropdown
+    loadDropdown(newDropdown);
+}, 100);
+                },
+                error: function () {
+                    alert('Failed to add a new row.');
+                }
+            });
+
+        });
+
+
+        $('.cancel-button').on('click', function () {
+            // Hide only the current modal (inner modal)
+            $(this).closest('.modal').modal('hide');
+        });
+
+
+        var seriesDocMap = @Html.Raw(ViewBag.SeriesDocDict);
+
+        $(document).ready(function () {
+
+            $('.select2').select2({
+                width: 'resolve' // Adjust as needed
+            });
+
+            //this is for dropdow customer seliction
+            $.ajax({
+            url: '@Url.Action("GetCustomerListForDropDown", "Purchase")',
+            type: 'GET',
+            data: {
+                customertype: 'S',
+                _: new Date().getTime() // Prevents caching
+            },
+                success: function (response) {
+                const data = response.data || response; // Handles both { data: [] } and []
+
+                for (var i = 0; i < data.length; i++) {
+                    var option = "<option value='" + data[i].CustomerID + "'>" + data[i].CustomerID +" - "+ data[i].Name + "</option>";
+                    $("#customerList").append(option);
+                }
+            },
+            error: function () {
+                alert('Failed to load customer data.');
+            }
+            });
+            // end
+
+
+             var successMessage = '@TempData["SuccessMessage"]';
+             var infoMessage = '@TempData["InfoMessage"]';
+             var errMessage = '@TempData["ErrorMessage"]';
+
+             if (successMessage) {
+                 Swal.fire({
+                     icon: 'success',
+                     title: 'Success',
+                     text: successMessage,
+                     confirmButtonColor: '#3085d6',
+                     confirmButtonText: 'OK'
+                 });
+             }
+
+             if (infoMessage) {
+                 Swal.fire({
+                     icon: 'info',
+                     title: 'Information',
+                     text: infoMessage,
+                     confirmButtonColor: '#3085d6',
+                     confirmButtonText: 'OK'
+                 });
+             }
+             if (errMessage) {
+                 Swal.fire({
+                     icon: 'error',
+                     title: 'Error',
+                     text: errMessage,
+                     confirmButtonColor: '#3085d6',
+                     confirmButtonText: 'OK'
+                 });
+             }
+
+
+            $('#ddlSeries').change(function () {
+                var selectedSeries = $(this).val();
+                var docNum = seriesDocMap[selectedSeries];
+                $('#DocNum').val(docNum);
+            });
+
+
+            /*$('#addRow').click();*/
+
+            $(document).on('keydown', function (e) {
+                // Check if Alt + A is pressed
+                if (e.altKey && e.key.toLowerCase() === 'a') {
+                    e.preventDefault(); // prevent default browser behavior
+                    $('#addRow').click(); // trigger the Add Row button
+                }
+            });
+
+
+            // Add autocomplete
+            $(document).on('keyup', '.item-name', function () {
+                var $this = $(this);
+                var keyword = $this.val();
+                var $parentRow = $this.closest('tr');
+
+                if (keyword.length > 4) {
+                    $.ajax({
+                        url:  '@Url.Action("SearchItemNames", "Purchase")',
+                        type: 'GET',
+                        data: { term: keyword },
+                        success: function (response) {
+                            var dropdown = $('<ul class="autocomplete-items list-group"></ul>');
+                            dropdown.css({
+                                'position': 'absolute',
+                                'z-index': '1000',
+                                'width': $this.outerWidth(),
+                                'background': 'white',
+                                'border': '1px solid #ccc',
+                                'list-style': 'none',
+                                'padding-left': '0',
+                                'max-height': '200px',
+                                'overflow-y': 'auto'
+                            });
+
+                            $.each(response, function (i, item) {
+                                var listItem = $('<li class="list-group-item list-group-item-action" style="cursor:pointer;">' + item.ItemName + '</li>');
+                                listItem.data('itemData', item);
+                                dropdown.append(listItem);
+                            });
+
+                            // Remove previous dropdown
+                            $this.parent().find('.autocomplete-items').remove();
+                            $this.after(dropdown);
+
+                            // Handle click on item
+                            dropdown.find('li').on('click', function () {
+                                var selectedItem = $(this).data('itemData');
+                                $this.val(selectedItem.ItemName);
+                                $parentRow.find('input[name$=".ItemCode"]').val(selectedItem.ItemCode);
+                                /*$parentRow.find('input[name$=".Price"]').val(selectedItem.Price);*/
+
+                                onItemSelected2(selectedItem.ItemCode);
+                                dropdown.remove();
+                            });
+                        }
+                    });
+                } else {
+                    // If less than 4 characters, remove any existing dropdown
+                    $this.parent().find('.autocomplete-items').remove();
+                }
+            });
+
+            // Click outside closes the suggestion box
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.item-name, .autocomplete-items').length) {
+                    $('.autocomplete-items').remove();
+                }
+            });
+            // Add autocomplete
+
+
+
+
+
+
+
+            $(document).on('change', '.item-dropdown', function () {
+                var itemCode = $(this).val();
+                var row = $(this).closest('tr');
+                if (itemCode) {
+                    $.ajax({
+                        url:  '@Url.Action("GetItemDetails", "Purchase")',
+                        type: 'GET',
+                        data: { itemCode: itemCode },
+                        success: function (item) {
+                            if (item) {
+                                let vatRate = parseFloat(item.VAT) || 0;
+                                let baseAmount = 1 * parseFloat(item.Price) || 0;
+                                console.log(item.DisPer);
+                                let discountAmount = (baseAmount * parseFloat(item.DisPer) || 0) / 100;
+                                let vatAmount = ((baseAmount - discountAmount) * vatRate) / 100;
+                                let lineTotal = (baseAmount - discountAmount);
+
+                                row.find('input[name$=".ItemCode"]').val(item.ItemCode);
+                                row.find('.item-name').val(item.ItemName);
+                                row.find('input[name$=".UomEntry"]').val(item.UomEntry);
+                                row.find('input[name$=".UomName"]').val(item.UomName);
+                                row.find('input[name$=".DisPer"]').val(item.DisPer);
+                                row.find('input[name$=".Warehouse"]').val(item.Warehouse);
+                                row.find('input[name$=".Qty"]').val(1);
+                                row.find('input[name$=".Price"]').val(item.Price);
+                                row.find('input[name$=".OriginalPrice"]').val(item.Price);
+                                row.find('input[name$=".VatGrpCode"]').val(item.VatGrpCode);
+                                row.find('input[name$=".VAT"]').val(item.VAT);
+                                row.find('input[name$=".VatRate"]').val(vatAmount);
+                                row.find('input[name$=".LineTotal"]').val(lineTotal.toFixed(3));
+                                row.find('input[name$=".WhInstockQty"]').val(item.WhInstockQty);
+
+                                // === UOM Dropdown ===
+                                //let uomDropdown = row.find('.uom-dropdown');
+                                //uomDropdown.empty().append('<option value="">--Select--</option>');
+                                //$.each(item.lstUomDetails, function (i, uom) {
+                                //    uomDropdown.append(`<option value="${uom.UomCode}">${uom.UomName}</option>`);
+                                //});
+                                //uomDropdown.val(item.UomCode).trigger('change');
+
+                                let uomDropdown = row.find('.uom-dropdown');
+                                let selectedUomCode = null;
+                                $.each(item.lstUomDetails, function (i, uom) {
+                                    if (uom.UomName === item.UomName) {
+                                        selectedUomCode = uom.UomCode;
+                                    }
+                                });
+
+                                uomDropdown.empty().append('<option value="">--Select--</option>');
+                                $.each(item.lstUomDetails, function (i, uom) {
+                                    const isSelected = uom.UomCode === selectedUomCode;
+                                    uomDropdown.append(`<option value="${uom.UomName}" ${isSelected ? 'selected' : ''}>${uom.UomName}</option>`);
+                                });
+
+                                // === VAT Group Dropdown ===
+                                let vatgroupDropdown = row.find('.vatgroup-dropdown');
+                                vatgroupDropdown.empty().append('<option value="">--Select--</option>');
+                                $.each(item.lstVAT, function (i, vatgrp) {
+                                    vatgroupDropdown.append(`<option value="${vatgrp.VATCode}">${vatgrp.VATName}</option>`);
+                                });
+                                vatgroupDropdown.val(item.VatGrpCode).trigger('change');
+
+                                // === Warehouse Dropdown ===
+                                let warehouseDropdown = row.find('.warehouse-dropdown');
+                                warehouseDropdown.empty().append('<option value="">--Select--</option>');
+                                $.each(item.lstWarehouse, function (i, whs) {
+                                    warehouseDropdown.append(`<option value="${whs.WhsCode}">${whs.WhsName}</option>`);
+                                });
+                                warehouseDropdown.val(item.Warehouse).trigger('change');
+
+                                // === FOC Dropdown ===
+                                let focDropdown = row.find('.foc-dropdown');
+                                focDropdown.empty().append('<option value="No">No</option><option value="Yes">Yes</option>');
+                                focDropdown.val("No").trigger('change');
+
+                                row.find('.focremarks-textbox').val(item.focremarks || "");
+                                row.data('item', item);
+                            }
+                        }
+                    });
+                }
+            });
+
+
+            // On page load, initialize all existing item dropdowns
+            $('.item-dropdown').each(function () {
+                loadDropdown($(this), true);
+            });
+
+
+            // Add dropdown for Item
+
+
+        });
+
+
+
+    //passing the customerid into the popup
+    showSearchInPopup = (baseUrl, title, customerID) => {
+    if (!customerID) {
+    alert("Please select a Customer first.");
+    return;
+    }
+
+    let url = baseUrl + "?customerID=" + encodeURIComponent(customerID); // Append customerID to URL
+
+    $.ajax({
+    type: 'GET',
+    url: url,
+    success: function (res) {
+    $('#leadsearch-form-modal .modal-body').html(res);
+
+    if (!$('#leadsearch-form-modal').hasClass('show')) {
+    $('#leadsearch-form-modal').modal('show');
+    }
+    },
+    error: function () {
+    alert("Failed to load data.");
+    }
+    });
+    };
+
+
+           function onCustomerSelected(SelectedItem) {
+        var customerID = SelectedItem["id"];
+if (customerID) {
+//$('#customerCode').val(customerID);
+$.ajax({
+url: '@Url.Action("GetCustomer", "Purchase")',
+type: 'GET',
+data: { CustId: customerID },
+success: function (data) {
+
+    $("#CardCode").val(customerID);
+// Update Payment Terms (if you bind it dynamically)
+if (data.Paymentterms) {
+$('#Paymentterms').val(data.Paymentterms).trigger('change');
+}
+
+if (data.SlpCode) {
+$('#Salesemp').val(data.SlpCode).trigger('change');
+    }
+
+    if (data.deliveryLocation) {
+        $('#deliveryLocation').val(data.deliveryLocation).trigger('change');
+    }
+
+$('#leadsearch-form-modal').modal('hide');
+
+// Load Contact Person List
+if (data.lstContactPerson && data.lstContactPerson.length > 0) {
+var contactDropdown = $('#ContactPerson'); // Assuming you have a select box with ID ContactPerson
+contactDropdown.empty(); // Clear old items
+$.each(data.lstContactPerson, function (index, item) {
+contactDropdown.append($('<option>', {
+    value: item.ContactCode,
+    text: item.Name
+    }));
+    });
+    contactDropdown.trigger('change');
+    }
+
+    // Load Ship To Address List
+    if (data.lstShiptoAddress && data.lstShiptoAddress.length > 0) {
+    var shipToDropdown = $('#ShipToAddress'); // Assuming you have a select box with ID ShipToAddress
+    shipToDropdown.empty();
+    $.each(data.lstShiptoAddress, function (index, item) {
+    shipToDropdown.append($('<option>', {
+    value: item.Id, // Replace with correct property if different
+    text: item.Address // Replace with correct property if different
+    }));
+    });
+    shipToDropdown.trigger('change');
+    }
+
+    // Load Bill To Address List
+    if (data.lstBilltoAddress && data.lstBilltoAddress.length > 0) {
+    var billToDropdown = $('#BillToAddress'); // Assuming you have a select box with ID BillToAddress
+    billToDropdown.empty();
+    $.each(data.lstBilltoAddress, function (index, item) {
+    billToDropdown.append($('<option>', {
+    value: item.Id, // Replace with correct property if different
+    text: item.Address // Replace with correct property if different
+    }));
+    });
+    billToDropdown.trigger('change');
+    }
+
+
+    },
+    error: function () {
+    alert("Failed to load customer details.");
+    }
+
+
+
+    });
+    }
+    }
+    @*function onCustomerSelected(customerID) {
+    if (customerID) {
+    //$('#customerCode').val(customerID);
+    $.ajax({
+    url: '@Url.Action("GetCustomer", "SalesOrder")',
+    type: 'GET',
+    data: { CustId: customerID },
+    success: function (data) {
+
+    // Update Payment Terms (if you bind it dynamically)
+    if (data.Paymentterms) {
+    $('#Paymentterms').val(data.Paymentterms).trigger('change');
+    }
+
+    if (data.SlpCode) {
+    $('#Salesemp').val(data.SlpCode).trigger('change');
+        }
+
+        if (data.deliveryLocation) {
+            $('#deliveryLocation').val(data.deliveryLocation).trigger('change');
+        }
+
+    $('#leadsearch-form-modal').modal('hide');
+
+    // Load Contact Person List
+    if (data.lstContactPerson && data.lstContactPerson.length > 0) {
+    var contactDropdown = $('#ContactPerson'); // Assuming you have a select box with ID ContactPerson
+    contactDropdown.empty(); // Clear old items
+    $.each(data.lstContactPerson, function (index, item) {
+    contactDropdown.append($('<option>', {
+        value: item.Id,
+        text: item.Name
+        }));
+        });
+        contactDropdown.trigger('change');
+        }
+
+        // Load Ship To Address List
+        if (data.lstShiptoAddress && data.lstShiptoAddress.length > 0) {
+        var shipToDropdown = $('#ShipToAddress'); // Assuming you have a select box with ID ShipToAddress
+        shipToDropdown.empty();
+        $.each(data.lstShiptoAddress, function (index, item) {
+        shipToDropdown.append($('<option>', {
+        value: item.Id, // Replace with correct property if different
+        text: item.Address // Replace with correct property if different
+        }));
+        });
+        shipToDropdown.trigger('change');
+        }
+
+        // Load Bill To Address List
+        if (data.lstBilltoAddress && data.lstBilltoAddress.length > 0) {
+        var billToDropdown = $('#BillToAddress'); // Assuming you have a select box with ID BillToAddress
+        billToDropdown.empty();
+        $.each(data.lstBilltoAddress, function (index, item) {
+        billToDropdown.append($('<option>', {
+        value: item.Id, // Replace with correct property if different
+        text: item.Address // Replace with correct property if different
+        }));
+        });
+        billToDropdown.trigger('change');
+        }
+
+
+        },
+        error: function () {
+        alert("Failed to load customer details.");
+        }
+
+
+
+        });
+        }
+        }*@
+
+        function onItemSelected2(itemCode) {
+
+        $.ajax({
+        url:  '@Url.Action("GetItemDetails", "Purchase")',
+        type: 'GET',
+        data: { itemCode: itemCode },
+            success: function (item) {
+            if (selectedRowIndex >= 0) {
+        let row = $('#tbladdress tbody tr').eq(selectedRowIndex);
+
+        let vatRate = parseFloat(item.VAT) || 0;
+        let baseAmount = 1 * parseFloat(item.Price) || 0;
+        let discountAmount = (baseAmount * parseFloat(item.DisPer) || 0) / 100;
+        let vatAmount = ((baseAmount - discountAmount) * vatRate) / 100;
+        let lineTotal = (baseAmount - discountAmount);
+
+
+        row.find('input[name$=".ItemCode"]').val(item.ItemCode);
+        row.find('.item-name').val(item.ItemName);
+        row.find('input[name$=".DisPer"]').val(item.DisPer);
+        row.find('input[name$=".UomEntry"]').val(item.UomEntry);
+        row.find('input[name$=".UomName"]').val(item.UomName);
+        row.find('input[name$=".Warehouse"]').val(item.Warehouse);
+        row.find('input[name$=".Qty"]').val(1);
+        row.find('input[name$=".Price"]').val(item.Price);
+        row.find('input[name$=".OriginalPrice"]').val(item.Price);
+        row.find('input[name$=".VatGrpCode"]').val(item.VatGrpCode);
+        row.find('input[name$=".VAT"]').val(item.VAT);
+        row.find('input[name$=".VatRate"]').val(vatAmount);
+        row.find('input[name$=".LineTotal"]').val(lineTotal.toFixed(3));
+        row.find('input[name$=".WhInstockQty"]').val(item.WhInstockQty.toFixed(3));
+
+
+        let uomDropdown = row.find('.uom-dropdown');
+        let selectedUomCode = null;
+        $.each(item.lstUomDetails, function (i, uom) {
+        if (uom.UomName === item.UomName) {
+        selectedUomCode = uom.UomCode;
+        }
+        });
+
+        // Populate dropdown
+        uomDropdown.empty().append('<option value="">--Select--</option>');
+    $.each(item.lstUomDetails, function (i, uom) {
+    const isSelected = uom.UomCode === selectedUomCode;
+    uomDropdown.append(`<option value="${uom.UomCode}" ${isSelected ? 'selected' : '' }>${uom.UomName}</option>`);
+    });
+
+    let warehouseDropdown = row.find('.warehouse-dropdown');
+    warehouseDropdown.empty().append('<option value="">--Select--</option>');
+    $.each(item.lstWarehouse, function (i, whs) {
+    const isSelected = String(whs.WhsCode) === String(item.Warehouse);
+    warehouseDropdown.append(`<option value="${whs.WhsCode}" ${isSelected ? 'selected' : '' }>${whs.WhsName}</option>`);
+    });
+
+    let vatgroupDropdown = row.find('.vatgroup-dropdown');
+    vatgroupDropdown.empty().append('<option value=""></option>');
+    $.each(item.lstVAT, function (i, vatgrp) {
+    const isSelected = String(vatgrp.VATCode) === String(item.VatGrpCode);
+    vatgroupDropdown.append(`<option value="${vatgrp.VATCode}" ${isSelected ? 'selected' : '' }>${vatgrp.VATName}</option>`);
+    });
+
+    row.data('item', item); // Store the item with VAT list in the row's data
+
+    //console.log("Vat:", item.vatgroup);
+    //console.log("Vat List:", item.lstVAT);
+
+    let focDropdown = row.find('.foc-dropdown');
+    focDropdown.empty().append('<option value="No" selected>No</option><option value="Yes">Yes</option>');
+
+
+
+    calculateDocumentTotal();
+
+    }
+
+    $('#itemsearch-form-modal').modal('hide');
+    },
+    error: function () {
+    alert("Failed to retrieve item details.");
+    }
+    });
+    }
+
+    $(document).on('change', '.foc-dropdown', function () {
+    const row = $(this).closest('tr');
+    let focValue = $(this).val();
+        let focRemarksInput = row.find('.focremarks-textbox');
+
+        let price = parseFloat(row.find('input[name$=".Price"]').val()) || 0;
+        let originalPrice = parseFloat(row.find('input[name$=".OriginalPrice"]').val()) || 0;
+
+    if (focValue === 'Yes') {
+        focRemarksInput.prop('readonly', false);
+        row.find('input[name$=".Price"]').val(0);
+    } else {
+        focRemarksInput.prop('readonly', true).val('');
+        row.find('input[name$=".Price"]').val(originalPrice);
+        }
+
+        calculateLineTotal($(this).closest('tr'));
+
+    });
+
+        $(document).on('change', '.warehouse-dropdown', function () {
+            const row = $(this).closest('tr');
+            const selectedWhsCode = $(this).val();
+
+            const itemData = row.data('item'); // You need to store the item on row when populating
+            if (!itemData || !itemData.lstWarehouse) return;
+
+            const selectedWhs = itemData.lstWarehouse.find(v => v.WhsCode === selectedWhsCode);
+            if (selectedWhs) {
+
+                /* row.find('.vat-textbox').val(selectedVat.VatRate.toFixed(3));*/
+                row.find('.WhInstockQty-textbox').val(selectedWhs.InStock);
+
+            }
+
+            //calculateLineTotal($(this).closest('tr'));
+
+        });
+
+
+    $(document).on('change', '.vatgroup-dropdown', function () {
+    const row = $(this).closest('tr');
+    const selectedVatCode = $(this).val();
+
+    const itemData = row.data('item'); // You need to store the item on row when populating
+    if (!itemData || !itemData.lstVAT) return;
+
+    const selectedVat = itemData.lstVAT.find(v => v.VATCode === selectedVatCode);
+    if (selectedVat) {
+
+    /* row.find('.vat-textbox').val(selectedVat.VatRate.toFixed(3));*/
+    row.find('.vat-textbox').val(selectedVat.VatRate.toFixed(3));
+
+    }
+
+    calculateLineTotal($(this).closest('tr'));
+
+    });
+
+    $(document).on('change', 'input[name$=".Qty"], input[name$=".Price"], input[name$=".DisPer"]', function () {
+    const row = $(this).closest('tr');
+    const selectedVatCode = $(this).val();
+
+    calculateLineTotal($(this).closest('tr'));
+
+    });
+
+    function calculateLineTotal(row) {
+    let qty = parseFloat(row.find('input[name$=".Qty"]').val()) || 0;
+    let price = parseFloat(row.find('input[name$=".Price"]').val()) || 0;
+    let disPer = parseFloat(row.find('input[name$=".DisPer"]').val()) || 0;
+    let vatGrpCode = row.find('.vatgroup-dropdown').val();
+
+    console.log("Qty: ", qty);
+    console.log("price: ", price);
+
+
+    let vatRate = parseFloat(row.find('input[name$=".VAT"]').val()) || 0;
+    let baseAmount = qty * price;
+    let discountAmount = (baseAmount * disPer) / 100;
+    let vatAmount = ((baseAmount - discountAmount) * vatRate) / 100;
+    let lineTotal = (baseAmount - discountAmount);
+
+    console.log("DiscPer: ", disPer);
+    console.log("lineTotal: ", lineTotal);
+
+    //console.log("Base: ", baseAmount);
+    //console.log("discountAmount: ", discountAmount);
+    //console.log("vatRate: ", vatRate);
+    //console.log("vatAmount: ", vatAmount);
+    //console.log("lineTotal: ", lineTotal);
+
+    row.find('input[name$=".VatRate"]').val(vatAmount.toFixed(3));
+    row.find('input[name$=".LineTotal"]').val(lineTotal.toFixed(3));
+
+    calculateDocumentTotal();
+    }
+
+        function calculateDocumentTotal() {
+            console.log("test: ");
+    let total = 0;
+    let vatRate = 0;
+    let grandTotal = 0;
+    $('#tbladdress tbody tr').each(function () {
+    let lineTotal = parseFloat($(this).find('input[name$=".LineTotal"]').val()) || 0;
+    total += lineTotal;
+
+    let lineVatRate = parseFloat($(this).find('input[name$=".VatRate"]').val()) || 0;
+    vatRate += lineVatRate;
+
+    grandTotal += lineTotal + lineVatRate;
+    });
+
+    $('#TotalBeforeDiscount').val(total.toFixed(3));
+    $('#TotalTax').val(vatRate.toFixed(3));
+    $('#GrossTotal').val(grandTotal.toFixed(3));
+
+
+
+    }
+
+
+
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}
