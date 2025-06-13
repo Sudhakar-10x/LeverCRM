@@ -139,10 +139,12 @@ namespace _10xErp.Controllers
                                    " and (T1.\"CardCode\" ='" + bpCardCode + "' or T0.\"CardName\" like '%" + bpCardCode + "%')";
 
                     var ds = objHlpr.getDataSet(AddrsQry);
+                    var count = 1;
                     foreach (DataRow dr in ds.Tables[0].Rows)
                     {
                         BPAddressModel obj = new BPAddressModel
                         {
+                            Sno = count++,
                             //billTo = dr["Address2"].ToString(),
                             Address = dr["Address"].ToString(),
                             Address2 = dr["Address2"].ToString(),

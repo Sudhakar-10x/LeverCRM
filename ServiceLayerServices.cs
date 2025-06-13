@@ -674,6 +674,14 @@ namespace _10xErp
                                   .SingleOrDefault();
             return order;
         }
+
+        public Document GetPurchaseOrderDetails(int docEntry)
+        {
+            Document order = currentServiceContainer.Drafts
+                                  .Where(o => o.DocEntry == docEntry)
+                                  .SingleOrDefault();
+            return order;
+        }
         public string GetFOCValue(int orderEntry, int linenumber)
         {
             string FOCvalue = "";
@@ -1860,6 +1868,39 @@ namespace _10xErp
             {
                 //currentServiceContainer.AddToDrafts(doc);
                 currentServiceContainer.AddToOrders(doc);
+                //currentServiceContainer.AddToPurchaseDeliveryNotes(doc);
+                DataServiceResponse response = currentServiceContainer.SaveChanges();
+                if (null != response)
+                {
+                    ChangeOperationResponse opRes = (ChangeOperationResponse)response.SingleOrDefault();
+                    object retObj = ((System.Data.Services.Client.EntityDescriptor)(opRes.Descriptor)).Entity;
+                    if (null != retObj)
+                    {
+                        newDoc = (Document)retObj;
+                    }
+
+                    //HTTP_CREATED, value 201, used to indicate success                    
+                }
+            }
+            catch (Exception ex)
+            {
+                //Discard the order from beting tracking
+                currentServiceContainer.Detach(doc);
+                throw ex;
+            }
+
+            return newDoc;
+        }
+
+        public Document AddPurchaseOrder(Document doc)
+
+        {
+            Document newDoc = null;
+
+            try
+            {
+                //currentServiceContainer.AddToDrafts(doc);
+                currentServiceContainer.AddToPurchaseOrders(doc);
                 //currentServiceContainer.AddToPurchaseDeliveryNotes(doc);
                 DataServiceResponse response = currentServiceContainer.SaveChanges();
                 if (null != response)

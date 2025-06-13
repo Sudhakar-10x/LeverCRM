@@ -177,6 +177,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BusinessPartnerController.cs" />
+    <Compile Include="Controllers\CreditMemoController.cs" />
     <Compile Include="Controllers\DeliveryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InvoiceController.cs" />
@@ -194,6 +195,7 @@
     <Compile Include="Models\DeliveryOrderViewModel.cs" />
     <Compile Include="Models\ItemViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
+    <Compile Include="Models\PurchaseViewModel.cs" />
     <Compile Include="Models\SalesOrderViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\ServiceReferenceLayer\Reference.cs" />
@@ -245,6 +247,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Purchase\" />
+    <Folder Include="Views\CreditMemo\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css.map" />
@@ -307,9 +310,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Service References\ServiceReferenceLayer\service.edmx" />
     <Content Include="Views\SalesOrder\Create.cshtml" />
-    <Content Include="Views\SalesOrder\_ItemList.cshtml" />
-    <Content Include="Views\SalesOrder\_ItemRow.cshtml" />
-    <Content Include="Views\SalesOrder\CustomerGrid.cshtml" />
     <Content Include="Views\SalesOrder\GetNewItemRow.cshtml" />
     <Content Include="Views\SalesOrder\ItemGrid.cshtml" />
     <Content Include="Views\Product\Index.cshtml" />
@@ -317,28 +317,25 @@
     <Content Include="Views\BusinessPartner\Index.cshtml" />
     <Content Include="Views\BusinessPartner\ViewCustomerDetails.cshtml" />
     <Content Include="Views\SalesOrderUpload\Upload.cshtml" />
-    <Content Include="Views\SalesOrderUpload\_ItemRow.cshtml" />
     <Content Include="Views\SalesOrderUpload\ItemGrid.cshtml" />
-    <Content Include="Views\SalesOrderUpload\CustomerGrid.cshtml" />
     <Content Include="Views\SalesOrderUpload\GetNewItemRow.cshtml" />
-    <Content Include="Views\SalesOrderUpload\_ItemList.cshtml" />
     <Content Include="Views\SalesOrderUpload\_OrderPartial.cshtml" />
     <Content Include="Views\Delivery\Create.cshtml" />
-    <Content Include="Views\Delivery\_ItemRow.cshtml" />
-    <Content Include="Views\Delivery\CustomerGrid.cshtml" />
     <Content Include="Views\Delivery\GetNewItemRow.cshtml" />
     <Content Include="Views\Delivery\ItemGrid.cshtml" />
-    <Content Include="Views\Delivery\_ItemList.cshtml" />
     <Content Include="Views\Invoice\InvoiceCreate.cshtml" />
-    <Content Include="Views\Invoice\CustomerGrid.cshtml" />
     <Content Include="Views\Invoice\GetNewItemRow.cshtml" />
-    <Content Include="Views\Invoice\_ItemRow.cshtml" />
     <Content Include="Views\Invoice\ItemGrid.cshtml" />
-    <Content Include="Views\Invoice\_ItemList.cshtml" />
     <Content Include="Views\SalesOrder\Index.cshtml" />
     <Content Include="Views\Delivery\Index.cshtml" />
     <Content Include="Views\Delivery\DeliveryDocumentDetails.cshtml" />
     <Content Include="Views\SalesOrder\SalesOrderDetails.cshtml" />
+    <Content Include="Views\Shared\_ItemRow.cshtml" />
+    <Content Include="Views\Shared\_ItemList.cshtml" />
+    <Content Include="Views\Shared\CustomerGrid.cshtml" />
+    <Content Include="Views\Purchase\Index.cshtml" />
+    <Content Include="Views\Purchase\Create.cshtml" />
+    <Content Include="Views\Purchase\PurchaseOrderDetails.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

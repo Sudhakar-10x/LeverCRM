@@ -886,7 +886,7 @@ namespace _10xErp.Controllers
         public ActionResult CustomerGrid(string customerType)
         {
             ViewBag.CustomerID = customerType;
-            return PartialView();
+            return PartialView("~/Views/Shared/CustomerGrid.cshtml");
         }
 
         [HttpGet]
@@ -1109,7 +1109,7 @@ namespace _10xErp.Controllers
             try
             {
                 // Ensure the partial view exists and the model is valid
-                return PartialView("~/Views/Invoice/_ItemRow.cshtml", new ItemDetails { Index = id });
+                return PartialView("~/Views/Shared/_ItemRow.cshtml", new ItemDetails { Index = id });
             }
             catch (Exception ex)
             {
@@ -1122,7 +1122,7 @@ namespace _10xErp.Controllers
 
         public ActionResult _ItemRow(ItemDetails address)
         {
-            return PartialView("_ItemRow", address);
+            return PartialView("~/Views/Shared/_ItemRow", address);
         }
 
 

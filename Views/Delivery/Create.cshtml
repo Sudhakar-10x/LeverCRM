@@ -178,7 +178,7 @@
                         </div>
 
                         <div id="itemContainer">
-                            @Html.Partial("_ItemList", @Model.ItemDetailsListView)
+                            @Html.Partial("~/Views/Shared/_ItemList.cshtml", @Model.ItemDetailsListView)
                             @Html.ValidationMessageFor(m => m.ItemDetailsListView, "", new { @class = "text-danger" })
                         </div>
                         <hr />

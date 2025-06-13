@@ -846,7 +846,7 @@ namespace _10xErp.Controllers
         public ActionResult CustomerGrid(string customerType)
         {
             ViewBag.CustomerID = customerType;
-            return PartialView();
+            return PartialView("~/Views/Shared/CustomerGrid.cshtml");
         }
 
         [HttpGet]
@@ -1082,7 +1082,7 @@ namespace _10xErp.Controllers
 
         public ActionResult _ItemRow(ItemDetails address)
         {
-            return PartialView("_ItemRow", address);
+            return PartialView("~/Views/Shared/_ItemRow.cshtml", address);
         }
 
 

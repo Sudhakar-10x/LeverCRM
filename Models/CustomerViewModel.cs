@@ -59,6 +59,7 @@ namespace _10xErp.Models
 
     public class BPAddressModel
     {
+        public int Sno { get; set; }
         public string Address { get; set; }
         public string Address2 { get; set; }
         public string Address3 { get; set; }
