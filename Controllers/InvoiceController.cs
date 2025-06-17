@@ -69,6 +69,147 @@ namespace _10xErp.Controllers
             return View(oSalesInvoiceViewModel);
         }
 
+        public JsonResult GetItemDetailsList(string fromDate, string toDate)
+        {
+            List<object> itemList = new List<object>();
+            DataSet ds = new DataSet();
+
+            try
+            {
+                // Use current month range if no dates provided
+                DateTime from = string.IsNullOrEmpty(fromDate)
+                    ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
+                    : DateTime.Parse(fromDate);
+
+                DateTime to = string.IsNullOrEmpty(toDate)
+                    ? new DateTime(DateTime.Now.Year, DateTime.Now.Month,
+                        DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month))
+                    : DateTime.Parse(toDate);
+
+                string sqlCon = ConfigurationManager.AppSettings["SqlCon"].ToString();
+                using (SqlConnection conn = new SqlConnection(sqlCon))
+                {
+
+                    string username = Session["USERNAME"].ToString();
+                    string query = "SELECT T0.\"DocEntry\", T0.\"DocNum\", T0.\"CardCode\", T0.\"CardName\", T0.\"NumAtCard\", " +
+                                   "T0.\"CreateDate\", T0.\"DocTotal\", T0.\"UserSign\", T1.\"U_NAME\" AS \"CreatedBy\", " +
+                                   "T2.\"USER_CODE\", SUM(T3.\"Quantity\") AS \"TotalQty\", T0.\"ObjType\" AS \"ObjectType\"," +
+                                   "(Case when T0.DocStatus ='O' then 'Open' when T0.DocStatus ='C' then 'Closed' else '' end ) as \"Status\" " +
+                                   "FROM \"OINV\" T0 INNER JOIN \"OUSR\" T1 ON T0.\"UserSign\" = T1.\"USERID\" " +
+                                   "LEFT JOIN \"OUSR\" T2 ON (T2.\"U_SUser\" = T1.\"USER_CODE\" OR T2.\"USER_CODE\" = T1.\"USER_CODE\") " +
+                                   "INNER JOIN \"INV1\" T3 ON T0.\"DocEntry\" = T3.\"DocEntry\" " +
+                                   "WHERE T0.\"CANCELED\" = 'N' AND T0.\"ObjType\" = '13' " +
+                                   "AND T2.\"USER_CODE\" = '" + username + "' " +
+                                   "AND T0.\"CreateDate\" BETWEEN '" + fromDate + "' AND '" + toDate + "' " +
+                                   "GROUP BY T0.\"DocEntry\", T0.\"DocNum\", T0.\"CardCode\", T0.\"CardName\", T0.\"NumAtCard\",T0.\"DocStatus\", " +
+                                   "T0.\"CreateDate\", T0.\"DocTotal\", T0.\"UserSign\", T1.\"U_NAME\", T2.\"USER_CODE\", T0.\"ObjType\" " +
+                                   "ORDER BY T0.\"DocEntry\" DESC";
+
+
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@FromDate", from);
+                        cmd.Parameters.AddWithValue("@ToDate", to);
+
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(ds);
+
+                        foreach (DataRow row in ds.Tables[0].Rows)
+                        {
+                            itemList.Add(new
+                            {
+                                DocEntry = Convert.ToInt32(row["DocEntry"]),
+                                DocNum = Convert.ToInt32(row["DocNum"]),
+                                CardCode = row["CardCode"].ToString(),
+                                CardName = row["CardName"].ToString(),
+                                NumAtCard = row["NumAtCard"].ToString(),
+                                CreateDate = Convert.ToDateTime(row["CreateDate"]).ToString("yyyy-MM-dd"),
+                                DocTotal = Convert.ToDecimal(row["DocTotal"]),
+                                CreatedBy = row["CreatedBy"].ToString(),
+                                TotalQty = Convert.ToInt32(row["TotalQty"]),
+                                Status = Convert.ToString(row["Status"])
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Optionally log error
+                Console.WriteLine(ex.Message);
+            }
+
+            return Json(new { data = itemList }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult SalesInvoiceDetails(int id)
+        {
+            ServiceLayerServices currentOdataService = (ServiceLayerServices)System.Web.HttpContext.Current.Application["sapAppGlobal"];
+
+            // Login if needed
+            currentOdataService = LoginLogoutAction(true);
+
+            var oInvoice = currentOdataService.GetSalesInvoices(id);
+
+            if (oInvoice == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Fetch names using services
+            string contactPersonName = currentOdataService.GetContactPersonName(oInvoice.CardCode, oInvoice.ContactPersonCode);
+            string paymentTermName = currentOdataService.GetPaymentTermName(oInvoice.PaymentGroupCode);
+            string salesEmployeeName = currentOdataService.GetSalesEmployeeName(oInvoice.SalesPersonCode);
+            string seriesName = currentOdataService.GetSeriesname(oInvoice.Series.Value);
+            // Mapping Document to SalesoInvoiceViewModel
+            SalesInvoiceModel SLSVIEW = new SalesInvoiceModel
+            {
+                CardCode = oInvoice.CardCode,
+                CardName = oInvoice.CardName,
+                RefNo = oInvoice.NumAtCard,
+                //contactPerson = oInvoice.ContactPersonCode.ToString(), // You may convert this to name if needed
+                //Paymentterms = oInvoice.PaymentGroupCode.ToString(),   // You may fetch the description if needed
+                contactPerson = contactPersonName,
+                Paymentterms = paymentTermName,
+                Shiptocode = oInvoice.ShipToCode,
+                Billtocode = oInvoice.PayToCode,
+                postingdate = oInvoice.DocDate ?? DateTime.MinValue,
+                ReqDate = oInvoice.DocDueDate ?? DateTime.MinValue,
+                LPODate = oInvoice.TaxDate ?? DateTime.MinValue,
+                seriesName = seriesName, //oInvoice.Series.Value,
+                Remarks = oInvoice.Comments,
+                //Salesemp = oInvoice.SalesPersonCode.ToString(), // Again, resolve name if needed
+                Salesemp = salesEmployeeName,
+                deliveryLocation = oInvoice.Address2,
+                DocNum = oInvoice.DocNum.Value,
+                TotalBeforeDiscount = currentOdataService.GetTotalInvoiceSum(Convert.ToInt32(oInvoice.DocEntry)),
+                DocDiscount = currentOdataService.GetTotalDiscSumInvoice(Convert.ToInt32(oInvoice.DocEntry)),
+                TotalTax = oInvoice.VatSum.HasValue ? (decimal?)oInvoice.VatSum.Value : null,
+                GrossTotal = oInvoice.DocTotal.HasValue ? (decimal?)oInvoice.DocTotal.Value : null,
+                ItemDetailsListView = oInvoice.DocumentLines.Select(line => new ItemDetails
+                {
+                    ItemName = line.ItemDescription,
+                    ItemCode = line.ItemCode,
+                    UomName = line.UoMCode,
+                    Qty = (decimal?)line.Quantity, // Safe and correct
+                    foc = currentOdataService.GetFOCValueDocument(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum),"Invoice"),
+                    focremarks = currentOdataService.GetFOCRemarksDocument(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum), "Invoice"),
+                    Price = (decimal?)line.UnitPrice,
+                    DisPer = (decimal)(line.DiscountPercent ?? 0),
+                    VatGrpCode = line.VatGroup,
+                    //VAT = line.VatGroup,
+
+                    LineTotal = (decimal)(line.LineTotal ?? 0),
+                    Warehouse = line.WarehouseCode,
+                    WhInstockQty = 0 // Optionally call service to get actual in-stock from warehouse
+                }).ToList()
+            };
+
+            return View(SLSVIEW);
+        }
+
         //public ActionResult InvoiceCreate_D() // for Delivery screen
         //{
         //    ViewBag.UserName = User.Identity.Name;

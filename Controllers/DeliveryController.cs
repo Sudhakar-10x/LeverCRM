@@ -153,8 +153,8 @@ namespace _10xErp.Controllers
                     ItemCode = line.ItemCode,
                     UomName = line.UoMCode,
                     Qty = (decimal?)line.Quantity, // Safe and correct
-                    foc = currentOdataService.GetFOCValue(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum)),
-                    focremarks = currentOdataService.GetFOCRemarks(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum)),
+                    foc = currentOdataService.GetFOCValueDocument(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum),"Delivery"),
+                    focremarks = currentOdataService.GetFOCRemarksDocument(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum), "Delivery"),
                     Price = (decimal?)line.UnitPrice,
                     DisPer = (decimal)(line.DiscountPercent ?? 0),
                     VatGrpCode = line.VatGroup,
