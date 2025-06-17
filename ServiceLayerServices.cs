@@ -675,6 +675,14 @@ namespace _10xErp
             return order;
         }
 
+        public Document GetSalesInvoices(int docEntry)
+        {
+            Document oInvoice = currentServiceContainer.Invoices
+                                  .Where(o => o.DocEntry == docEntry)
+                                  .SingleOrDefault();
+            return oInvoice;
+        }
+
         public Document GetPurchaseOrderDetails(int docEntry)
         {
             Document order = currentServiceContainer.Drafts
@@ -686,7 +694,7 @@ namespace _10xErp
         {
             string FOCvalue = "";
             string strFOCvalue = "select (Case when ISNULL(T1.U_FOC,'No') ='Y' then 'Yes' else 'No' end) as \"FOC\" from DRF1 T1 " +
-                " inner join DRF1 T0 on T1.DocEntry = T0.DocEntry where t0.DocEntry ='" + orderEntry + "' and T1.LineNum ='" + linenumber + "'";
+                " where t1.DocEntry ='" + orderEntry + "' and T1.LineNum ='" + linenumber + "'";
 
             DataSet dsData = objHlpr.getDataSet(strFOCvalue);
             foreach (DataRow dr in dsData.Tables[0].Rows)
@@ -700,8 +708,7 @@ namespace _10xErp
             string focRemark = "";
             string strFOCRemarkQuery = "SELECT ISNULL(T1.U_FocRemark, '') AS \"FocRemark\" " +
                                        "FROM DRF1 T1 " +
-                                       "INNER JOIN DRF1 T0 ON T1.DocEntry = T0.DocEntry " +
-                                       "WHERE T0.DocEntry = '" + orderEntry + "' AND T1.LineNum = '" + linenumber + "'";
+                                       "WHERE T1.DocEntry = '" + orderEntry + "' AND T1.LineNum = '" + linenumber + "'";
 
             DataSet dsData = objHlpr.getDataSet(strFOCRemarkQuery);
             if (dsData.Tables[0].Rows.Count > 0)
@@ -711,6 +718,51 @@ namespace _10xErp
             return focRemark;
         }
 
+        public string GetFOCValueDocument(int orderEntry, int linenumber,string DocType)
+        {
+            string FOCvalue = "";
+            string strFOCvalue = "";
+            if (DocType == "Invoice")
+            {
+                strFOCvalue = "select (Case when ISNULL(T1.U_FOC,'No') ='Y' then 'Yes' else 'No' end) as \"FOC\" from INV1 T1 " +
+                    " where t1.DocEntry ='" + orderEntry + "' and T1.LineNum ='" + linenumber + "'";
+            }
+            else if (DocType == "Invoice")
+            {
+                strFOCvalue = "select (Case when ISNULL(T1.U_FOC,'No') ='Y' then 'Yes' else 'No' end) as \"FOC\" from DLN1 T1 " +
+                    " where t1.DocEntry ='" + orderEntry + "' and T1.LineNum ='" + linenumber + "'";
+            }
+            DataSet dsData = objHlpr.getDataSet(strFOCvalue);
+            foreach (DataRow dr in dsData.Tables[0].Rows)
+            {
+                FOCvalue = dsData.Tables[0].Rows[0]["FOC"].ToString().Trim();
+            }
+            return FOCvalue;
+        }
+        public string GetFOCRemarksDocument(int orderEntry, int linenumber, string DocType)
+        {
+            string focRemark = "";
+            string strFOCRemarkQuery = "";
+            if (DocType == "Invoice")
+            {
+                strFOCRemarkQuery = "SELECT ISNULL(T1.U_FocRemark, '') AS \"FocRemark\" " +
+                                       "FROM INV1 T1 " +
+                                       "WHERE T1.DocEntry = '" + orderEntry + "' AND T1.LineNum = '" + linenumber + "'";
+            }
+            else if (DocType == "Invoice")
+            {
+                strFOCRemarkQuery = "SELECT ISNULL(T1.U_FocRemark, '') AS \"FocRemark\" " +
+                                       "FROM DLN1 T1 " +
+                                       "WHERE T1.DocEntry = '" + orderEntry + "' AND T1.LineNum = '" + linenumber + "'";
+            }
+
+            DataSet dsData = objHlpr.getDataSet(strFOCRemarkQuery);
+            if (dsData.Tables[0].Rows.Count > 0)
+            {
+                focRemark = dsData.Tables[0].Rows[0]["FocRemark"].ToString().Trim();
+            }
+            return focRemark;
+        }
         public string GetContactPersonName(string cardCode, int? contactPersonCode)
         {
             if (!contactPersonCode.HasValue || string.IsNullOrEmpty(cardCode)) return "";
@@ -769,6 +821,27 @@ namespace _10xErp
             return SeriesName != null ? SeriesName : "";
         }
 
+        public decimal GetTotalInvoiceSum(int DocEntry)
+        {
+            Document order = currentServiceContainer.Invoices
+                                  .Where(o => o.DocEntry == DocEntry)
+                                  .SingleOrDefault();
+
+            //var emp = currentServiceContainer.Drafts
+            //.Where(s => s.DocEntry == DocEntry)
+            //.FirstOrDefault();
+
+            decimal totalLineAmount = 0;
+
+            if (order != null && order.DocumentLines != null)
+            {
+                totalLineAmount = order.DocumentLines
+                    .Where(l => l.LineTotal != null)
+                    .Sum(l => (decimal)l.LineTotal);
+            }
+
+            return order != null ? totalLineAmount : 0;
+        }
         public decimal GetTotalSum(int DocEntry)
         {
             Document order = currentServiceContainer.Drafts
@@ -790,6 +863,21 @@ namespace _10xErp
 
             return order != null ? totalLineAmount : 0;
         }
+        public decimal GetTotalDiscSumInvoice(int DocEntry)
+        {
+            Document order = currentServiceContainer.Invoices
+                                  .Where(o => o.DocEntry == DocEntry)
+                                  .SingleOrDefault();
+
+            decimal totalLineAmount = GetTotalInvoiceSum(DocEntry);
+
+            decimal disPer = Convert.ToDecimal(order.DiscountPercent);
+            decimal discSum = (totalLineAmount * disPer / 100);
+
+
+            return order != null ? discSum : 0;
+        }
+
         public decimal GetTotalSumDelivery(int DocEntry)
         {
             Document order = currentServiceContainer.DeliveryNotes
