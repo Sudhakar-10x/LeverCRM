@@ -78,28 +78,28 @@
                     @*<li class="@Html.IsSelected(controller: "Delivery")">
                     <a href="@Url.Action("Index", "Delivery")">Delivery Document</a>
                 </li>*@
-                    <li class="@Html.IsSelected(controller: "Delivery")">
-                        <a href="@Url.Action("Create", "Delivery")">New Delivery</a>
-                    </li>
-                    <li class="@Html.IsSelected(controller: "CreditMemo")">
-                        <a href="@Url.Action("Index", "CreditMemo")">AR Credit Memo</a>
-                    </li>
-                    <li class="@Html.IsSelected(controller: "Invoice")">
-                        <a href="@Url.Action("Index", "Invoice")">Sales Invoice</a>
-                    </li>
+                    @*<li class="@Html.IsSelected(controller: "Delivery")">
+                    <a href="@Url.Action("Create", "Delivery")">New Delivery</a>
+                </li>*@
+                    @*<li class="@Html.IsSelected(controller: "ARCreditMemo")">
+                    <a href="@Url.Action("Create", "ARCreditMemo")">A/R Credit Memo</a>
+                </li>*@
+                    @*<li class="@Html.IsSelected(controller: "Invoice")">
+                    <a href="@Url.Action("Index", "Invoice")">Sales Invoice</a>
+                </li>*@
                 </ul>
             </li>
 
             <!--Purchase Folder-->
-            <li>
-                <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Purchase</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li class="@Html.IsSelected(controller: "PurchaseOrder")">
-                        <a href="@Url.Action("Index", "Purchase")">Purchase Order</a>
-                    </li>
+            @*<li>
+            <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Purchase</span> <span class="fa arrow"></span></a>
+            <ul class="nav nav-second-level">
+                <li class="@Html.IsSelected(controller: "PurchaseOrder")">
+                    <a href="@Url.Action("Index", "Purchase")">Purchase Order</a>
+                </li>
 
-                </ul>
-            </li>
+            </ul>
+            </li>*@
             <li>
                 <a href="#"><i class="fa fa-database"></i> <span class="nav-label">Reports</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
