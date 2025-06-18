@@ -1,0 +1,201 @@
+﻿@*@model _10xErp.Models.SalesOrderViewModel*@
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="form-group row align-items-center">
+                        <div>
+                            <label for="txtMulti" class="col-sm-3 col-form-label">Test Multiple :</label>
+                            <select class="js-example-basic-multiple" name="states[]" multiple="multiple" id="txtMulti" style="width: 250px;">
+                                <option value="1">Option A</option>
+                                <option value="2">Option B</option>
+                                <option value="3">Option C</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row align-items-center">
+                        <label for="frmCust" class="col-sm-3 col-form-label">Customer from :</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="frmCust" class="form-control" />
+                        </div>
+                        <label for="toCust" class="col-sm-1 col-form-label">To :</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="toCust" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row align-items-center">
+                        <label for="toCust" class="col-sm-3 col-form-label">Sales Employee From :</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="frmSlp" class="form-control" />
+                        </div>
+                        <label for="toSlp" class="col-sm-1 col-form-label">To :</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="toSlp" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row align-items-center">
+                        <label for="fromDate" class="col-sm-3 col-form-label">As on Date : </label>
+                        <div class="col-sm-3">
+                            <input type="date" id="fromDate" class="form-control" />
+                        </div>
+                        <div class="col-sm-4">
+                            <button id="loadDataBtn" class="btn btn-primary">Load</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom styles -->
+<style>
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    #itemTable th, #itemTable td {
+        vertical-align: middle !important;
+    }
+
+    #itemTable thead th {
+        white-space: nowrap;
+    }
+</style>
+
+@section scripts {
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('.js-example-basic-multiple').select2();
+            function getDefaultDateRange() {
+                //const start = moment().startOf('month').format('YYYY-MM-DD');
+                const today = moment().format('YYYY-MM-DD');
+                const end = moment().endOf('month').format('YYYY-MM-DD');
+                return { fromDate: today, toDate: end };
+            }
+
+            // ✅ Set default dates on page load
+            const defaults = getDefaultDateRange();
+            $('#fromDate').val(defaults.fromDate);
+            $('#toDate').val(defaults.toDate);
+            @*var baseUrl = '@Url.Action("SalesOrderDetails", "SalesOrder", new { id = "__docEntry__" })';
+            var docEntry = row.DocEntry;
+            var finalUrl = baseUrl.replace('__docEntry__', docEntry);*@
+
+            const detailsUrlTemplate = '@Url.Action("SalesOrderDetails", "SalesOrder", new { id = "__id__" })';
+
+
+            // Result: /SalesOrder/SalesOrderDetails/123
+
+            var table = $('#itemTable').DataTable({
+                ajax: {
+                    url: '@Url.Action("GetItemDetailsList", "SalesOrder")',
+                    data: function (d) {
+                        let fromDate = $('#fromDate').val();
+                        let toDate = $('#toDate').val();
+
+                        if (!fromDate || !toDate) {
+                            const defaults = getDefaultDateRange();
+                            fromDate = defaults.fromDate;
+                            toDate = defaults.toDate;
+                        }
+
+                        d.fromDate = fromDate;
+                        d.toDate = toDate;
+                    }
+                },
+                columns: [
+                    { data: null },
+                    { data: 'DocNum', className: 'text-right' },
+                    { data: 'DocEntry', className: 'text-right' },
+                    { data: 'CardCode', className: 'text-right' },
+                    { data: 'CardName', className: 'text-left' },
+                    { data: 'NumAtCard', className: 'text-left' },
+                    {
+                        data: 'CreateDate',
+                        className: 'text-right',
+                        render: function (data) {
+                            return data ? moment(data).format('YYYY-MM-DD') : '';
+                        }
+                    },
+                    {
+                        data: 'DocTotal',
+                        className: 'text-right',
+                        render: $.fn.dataTable.render.number(',', '.', 2, '')
+                    },
+                    { data: 'CreatedBy', className: 'text-left' },
+                    { data: 'TotalQty', className: 'text-right' },
+                    { data: 'Status', className: 'text-left' },
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        render: function (data, type, row) {
+                            const detailsUrl = detailsUrlTemplate.replace('__id__', row.DocEntry);
+                            return `<a href="${detailsUrl}" title="View Details"><i class="fa fa-eye"></i></a>`;
+                        }
+                    }
+                ],
+                order: [[1, 'desc']],
+                responsive: true,
+                autoWidth: false,
+                scrollX: true,
+                scrollY: '400px',
+                scrollCollapse: true,
+                language: {
+                    emptyTable: "No records available"
+                },
+                initComplete: function () {
+                    this.api().columns.adjust();
+                },
+                drawCallback: function () {
+                    var api = this.api();
+                    var pageInfo = api.page.info();
+                    api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = pageInfo.start + i + 1;
+                    });
+
+                    // Adjust columns on every draw
+                    api.columns.adjust();
+                }
+            });
+
+            // ✅ Load button functionality
+            $('#loadDataBtn').click(function () {
+                let selectedValues = $('#dropdown').val(); // array of selected values
+                console.log(selectedValues);
+                //table.ajax.reload(null, false); // retain pagination
+            });
+
+            // ✅ Responsive column adjustment on various events
+            $(window).on('resize', function () {
+                table.columns.adjust();
+            });
+
+            // On pagination
+            table.on('page.dt', function () {
+                table.columns.adjust();
+            });
+
+            // On search
+            table.on('search.dt', function () {
+                table.columns.adjust();
+            });
+
+            // On ordering
+            table.on('order.dt', function () {
+                table.columns.adjust();
+            });
+        });
+    </script>
+}
+
