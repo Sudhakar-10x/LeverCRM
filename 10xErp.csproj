@@ -276,10 +276,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-<<<<<<< Updated upstream
     <Folder Include="Views\CreditMemo\" />
-=======
->>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css.map" />
