@@ -276,7 +276,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-<<<<<<< Updated upstream
     <Folder Include="Views\CreditMemo\" />
   </ItemGroup>
   <ItemGroup>
@@ -366,7 +365,7 @@
     <Content Include="Views\Purchase\Index.cshtml" />
     <Content Include="Views\Purchase\Create.cshtml" />
     <Content Include="Views\Purchase\PurchaseOrderDetails.cshtml" />
-<<<<<<< Updated upstream
+
     <EmbeddedResource Include="Views\Invoice\Index.cshtml" />
     <EmbeddedResource Include="Views\Invoice\SalesInvoiceDetails.cshtml" />
     <Content Include="Views\CreditMemo\GetNewItemRow.cshtml" />
