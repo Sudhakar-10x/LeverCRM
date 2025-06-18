@@ -273,6 +273,8 @@ namespace _10xErp.Models
 
     public class SalesInvoiceModel : IValidatableObject
     {
+        public string seriesName { get; set; }
+        public int series { get; set; }
         //[Required]
         public string CardCode { get; set; }
         //[Required]
@@ -294,7 +296,7 @@ namespace _10xErp.Models
         public string deliverydate { get; set; }
         public DateTime postingdate { get; set; }
         public DateTime LPODate { get; set; }
-        public int series { get; set; }
+        //public int series { get; set; }
         public string contactPerson { get; set; }
         public string DeliveryTerms { get; set; }
         public string Shiptocode { get; set; }

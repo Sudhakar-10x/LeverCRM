@@ -23,10 +23,10 @@ namespace _10xErp.Controllers
 
         public ActionResult Index()
         {
-            SalesOrderViewModel oSalesGenReqModel = new SalesOrderViewModel();
+            SalesOrderViewModel oSalesOrderModel = new SalesOrderViewModel();
 
             ViewBag.Current = "SalesOrder";
-            return View(oSalesGenReqModel);
+            return View(oSalesOrderModel);
         }
 
 
@@ -264,6 +264,7 @@ namespace _10xErp.Controllers
                                 oSeleOrdrReqst.TaxDate = Convert.ToDateTime(oSODetails.LPODate);
                                 oSeleOrdrReqst.NumAtCard = oSODetails.RefNo;
                                 oSeleOrdrReqst.U_DelLocation = oSODetails.deliveryLocation;
+                                oSeleOrdrReqst.U_PUser = @Session["UserName"].ToString();
                                 oSeleOrdrReqst.U_IsFrmPrtal = "Y";
                                 oSeleOrdrReqst.ContactPersonCode = !string.IsNullOrEmpty(oSODetails.contactPerson) ? 0 : Convert.ToInt32(oSODetails.contactPerson);
                                 //oSeleOrdrReqst.U_PDTUSER = oSODetails.EmpID;
@@ -1069,7 +1070,8 @@ namespace _10xErp.Controllers
             try
             {
                 // Ensure the partial view exists and the model is valid
-                return PartialView("~/Views/SalesOrder/_ItemRow.cshtml", new ItemDetails { Index = id });
+                //return PartialView("~/Views/SalesOrder/_ItemRow.cshtml", new ItemDetails { Index = id });
+                return PartialView("~/Views/Shared/_ItemRow.cshtml", new ItemDetails { Index = id });
             }
             catch (Exception ex)
             {

@@ -433,6 +433,7 @@ function loadDropdown(dropdown, isInitialLoad = false) {
                 url: "@Url.Action("GetNewItemRow", "SalesOrder")" + "/" + indx,
                 method: 'GET',
                 success: function (response) {
+                    console.log(response);
                     response = response
         .replace(/<\s*html[^>]*>/gi, '')
         .replace(/<\s*\/\s*html\s*>/gi, '')
