@@ -1906,6 +1906,43 @@ namespace _10xErp
         }
 
         /// <summary>
+        /// Add a AR Credit Memo
+        /// </summary>
+        /// <param name="bp"></param>
+        /// <returns></returns>
+        public Document AddCreditMemo(Document doc)
+        {
+            Document newDoc = null;
+
+            try
+            {
+                //currentServiceContainer.AddToDrafts(doc);
+                currentServiceContainer.AddToCreditNotes(doc);
+                //currentServiceContainer.AddToPurchaseDeliveryNotes(doc);
+                DataServiceResponse response = currentServiceContainer.SaveChanges();
+                if (null != response)
+                {
+                    ChangeOperationResponse opRes = (ChangeOperationResponse)response.SingleOrDefault();
+                    object retObj = ((System.Data.Services.Client.EntityDescriptor)(opRes.Descriptor)).Entity;
+                    if (null != retObj)
+                    {
+                        newDoc = (Document)retObj;
+                    }
+
+                    //HTTP_CREATED, value 201, used to indicate success                    
+                }
+            }
+            catch (Exception ex)
+            {
+                //Discard the order from beting tracking
+                currentServiceContainer.Detach(doc);
+                throw ex;
+            }
+
+            return newDoc;
+        }
+
+        /// <summary>
         /// Add a GRN Po
         /// </summary>
         /// <param name="bp"></param>
