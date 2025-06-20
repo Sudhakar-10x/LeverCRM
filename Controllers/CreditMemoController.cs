@@ -52,6 +52,407 @@ namespace _10xErp.Controllers
             return View(oSalesInvoiceViewModel);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(SalesInvoiceModel oInvoiceDetails, string custCode)
+        {
+            ConfirmMsg cnfMsg = new ConfirmMsg();
+            bool logout = false;
+            string docsnum;
+            ServiceLayerServices currentOdataService;
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (!string.IsNullOrEmpty(oInvoiceDetails.CardCode))
+                    {
+                        if (oInvoiceDetails.ItemDetailsListView != null)
+                        {
+
+                            string strCurrentServiceURL = ConfigurationManager.AppSettings["CurrentServiceURL"];
+
+                            currentOdataService = (ServiceLayerServices)System.Web.HttpContext.Current.Application["sapAppGlobal"];
+
+                            currentOdataService = LoginLogoutAction(true);
+
+                            Uri service = new Uri(strCurrentServiceURL);
+
+                            currentOdataService.InitServiceContainer(strCurrentServiceURL);
+                            Document oSeleInvReqst = new Document();
+
+                            oSeleInvReqst.Requester = @Session["UserName"].ToString();
+                            oSeleInvReqst.ReqType = 12;
+                            // EmpID, Manag
+                            oSeleInvReqst.DocObjectCode = "13";
+                            oSeleInvReqst.SeriesString = "";
+                            oSeleInvReqst.Series = oInvoiceDetails.series;
+                            oSeleInvReqst.DocNum = oInvoiceDetails.DocNum;
+                            oSeleInvReqst.CardCode = oInvoiceDetails.CardCode;
+                            oSeleInvReqst.RequriedDate = Convert.ToDateTime(oInvoiceDetails.ReqDate);
+                            oSeleInvReqst.DocDueDate = Convert.ToDateTime(oInvoiceDetails.ReqDate);
+                            oSeleInvReqst.Comments = @Session["UserName"] + " " + oInvoiceDetails.Remarks;
+                            oSeleInvReqst.DocDate = Convert.ToDateTime(oInvoiceDetails.postingdate);
+                            oSeleInvReqst.TaxDate = Convert.ToDateTime(oInvoiceDetails.LPODate);
+                            //oSeleInvReqst.DocDueDate = DateTime.Today.Date;
+                            //oSeleInvReqst.TaxDate = DateTime.Today.Date;
+                            oSeleInvReqst.NumAtCard = oInvoiceDetails.RefNo;
+                            oSeleInvReqst.U_DelLocation = oInvoiceDetails.deliveryLocation;
+                            oSeleInvReqst.U_Prescri = oInvoiceDetails.Prescription;
+                            oSeleInvReqst.U_PrescriBy = oInvoiceDetails.PrescBy;
+                            oSeleInvReqst.U_InsComp = oInvoiceDetails.InsCompany;
+                            oSeleInvReqst.U_InsCrdNo = oInvoiceDetails.InsCard;
+                            oSeleInvReqst.U_InsPer = oInvoiceDetails.InsPer;
+                            oSeleInvReqst.U_InsAmt = oInvoiceDetails.InsAmt;
+                            oSeleInvReqst.U_Contact = oInvoiceDetails.Patient;
+
+                            oSeleInvReqst.U_IsFrmPrtal = "Y";
+                            oSeleInvReqst.ContactPersonCode = !string.IsNullOrEmpty(oInvoiceDetails.contactPerson) ? 0 : Convert.ToInt32(oInvoiceDetails.contactPerson);
+                            //oSeleInvReqst.U_PDTUSER = oInvoiceDetails.EmpID;
+
+                            //oSeleInvReqst.U_LocationName = getLocationName(oInvoiceDetails.WhseCode);
+                            //oSeleInvReqst.U_UserName = getEmpName(oInvoiceDetails.EmpID);
+                            //DocSeries oDocSeries = getSeriesInfo("Sales Order", oInvoiceDetails.WhseCode);
+
+                            //if (oDocSeries.SeriesId != null)
+                            //{
+                            //    oSeleQtnReqst.SeriesString = oDocSeries.SeriesName;
+                            //    oSeleQtnReqst.Series = oDocSeries.SeriesId;
+                            //}
+
+                            //oSeleInvReqst.Series = 8;
+                            var seObj = GetSalesEmployeeInfoByUId(oInvoiceDetails.EmpID);
+                            oSeleInvReqst.BPL_IDAssignedToInvoice = Convert.ToInt32(oInvoiceDetails.BranchId);
+                            oSeleInvReqst.PaymentGroupCode = Convert.ToInt32(oInvoiceDetails.Paymentterms);
+                            //oSeleInvReqst.NumAtCard = oInvoiceDetails.CustRefNo;
+                            oSeleInvReqst.DiscountPercent = Convert.ToDouble(oInvoiceDetails.DocDiscount);
+                            oSeleInvReqst.SalesPersonCode = seObj.AssignedEmpId;
+                            oSeleInvReqst.ShipToCode = oInvoiceDetails.Shiptocode;
+                            oSeleInvReqst.PayToCode = oInvoiceDetails.Billtocode;
+                            oSeleInvReqst.SalesPersonCode = Convert.ToInt32(oInvoiceDetails.Salesemp);
+                            DocumentLine oLine = null;
+                            int iLine = 0;
+                            foreach (ItemDetails itm in oInvoiceDetails.ItemDetailsListView)
+                            {
+                                oLine = new DocumentLine();
+
+                                oLine.ItemCode = itm.ItemCode;
+                                oLine.LineVendor = oInvoiceDetails.CardCode;
+                                oLine.Quantity = Convert.ToDouble(itm.Qty);
+
+                                oLine.DiscountPercent = Convert.ToDouble(itm.DisPer);
+
+                                oLine.Price = Convert.ToDouble(itm.Price);
+                                oLine.VatGroup = itm.VatGrpCode;
+
+
+                                oLine.UoMCode = itm.UomName;
+                                oLine.UoMEntry = itm.UomEntry;
+                                oLine.WarehouseCode = itm.Warehouse;
+                                oLine.LineNum = iLine;
+                                decimal itmPrice = Convert.ToDecimal(itm.Price);
+                                oLine.U_FOC = (itm.foc == "Yes") ? "Y" : "N";
+                                oLine.U_FocRemark = itm.focremarks;
+
+
+                                BatchNumber objBatch = new BatchNumber();
+
+                                objBatch.BaseLineNumber = iLine;
+                                //objBatch.Quantity = Math.Round(Convert.ToDouble(Convert.ToDouble(itm.Qty) * BaseQty), 3, MidpointRounding.AwayFromZero);// Convert.ToDouble(itmBsUomQty));
+                                objBatch.Quantity = Math.Round(Convert.ToDouble(itm.Qty), 3, MidpointRounding.AwayFromZero);// Convert.ToDouble(itmBsUomQty));
+                                objBatch.BatchNumberProperty = Convert.ToString(itm.Batches);
+
+                                oLine.BatchNumbers.Add(objBatch);
+
+                                //if (itm.DisPer > 0)
+                                //{
+                                //    itmPrice = itmPrice - (itmPrice * (itm.DisPer / 100));
+                                //}
+
+                                iLine++;
+
+                                //oLine.U_normalqty = Convert.ToDouble(itm.Qty);
+                                //oLine.U_Addbarcode = itm.Barcode;
+                                oLine.UnitPrice = Convert.ToDouble(itm.Price);
+                                oLine.DiscountPercent = Convert.ToDouble(itm.DisPer);
+
+
+                                oSeleInvReqst.DocumentLines.Add(oLine);
+
+
+                            }
+
+                            Document doc = null;
+
+
+                            doc = currentOdataService.AddCreditMemo(oSeleInvReqst);
+                            //var msg = "<div style='width:800px;margin:auto;padding:40px;border:1px solid #abd1b8;'><h2>10XSF</h2><h3>Hello, " + oInvoiceDetails.CardName + "</h3><h4>Your sales order has been successfully created!</h4><div style='background:#abd1b8;padding:20px 10px;'><p>Sales Order No: <b style='color:green'>" + doc.DocNum + "</b></p></div></div>";
+                            //var email = this.getCustomerEmail(oInvoiceDetails.CardCode);
+                            //SendCodeToEmail("raju.m432@gmail.com", msg);
+                            //UpdateRequestTime();
+                            cnfMsg.IsSucess = true;
+                            cnfMsg.CnfsMsg = "AR Credit Memo  Document Number :" + doc.DocNum + " Created Sucessfully";
+                            TempData["SuccessMessage"] = "AR Credit Memo  Document Number :" + doc.DocNum + " Created Sucessfully";
+                            return RedirectToAction("Create");
+                        }
+                        else
+                            TempData["ErrorMessage"] = "Make sure correct data to generate AR Credit Memo !!";
+                    }
+                    //TempData["ErrorMessage"] = "Please Make sure to select customer before generating sales order !!";
+                }
+                else
+                {
+                    oInvoiceDetails.CardCode = oInvoiceDetails.CardCode ?? Request.Form["CustomerID"];
+                    oInvoiceDetails.CardName = oInvoiceDetails.CardName ?? Request.Form["customerAutocomplete"];
+
+                    custCode = oInvoiceDetails.CardCode ?? Request.Form["CustomerID"];
+
+                    LoadDropdowns(custCode); // Load dropdowns again so page doesn't break
+
+                    if (oInvoiceDetails.ItemDetailsListView == null)
+                        oInvoiceDetails.ItemDetailsListView = new List<ItemDetails>();
+                    Utilities.SetResultMessage("Make sure correct data to generate AR Credit Memo !!");
+                    TempData["ErrorMessage"] = "Make sure correct data to generate AR Credit Memo !!";
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Utilities.SetResultMessage("AR Credit Memo" + ex.Message.ToString());
+
+                string Excpn = "";
+                if (ex.InnerException != null)
+                {
+                    Utilities.SetResultMessage("AR Credit Memo" + ex.Message.ToString());
+                    Root rObjt = JsonConvert.DeserializeObject<Root>(ex.InnerException.Message);
+                    Excpn = rObjt.error.message.value;
+                    if (Excpn == "No matching records found (ODBC -2028)")
+                    {
+                        cnfMsg.IsSucess = true;
+                        Excpn = "Sales Invoice went for Approval Successfully";
+                        //cnfMsg.CnfsMsg = "Sales order went for Approval Successfully";
+                        cnfMsg.Ref = "APPROVAL";
+                        TempData["SuccessMessage"] = "AR Credit Memo went for Approval Successfully";
+                        return RedirectToAction("Create");
+                    }
+                    else
+                    {
+                        cnfMsg.IsSucess = false;
+                        Excpn = rObjt.error.message.value;
+                        TempData["ErrorMessage"] = rObjt.error.message.value;
+                    }
+
+                    cnfMsg.CnfsMsg = Excpn;
+                }
+                else
+                {
+                    Excpn = ex.Message.ToString();
+                    TempData["ErrorMessage"] = ex.Message.ToString();
+
+                }
+            }
+            //return Json(cnfMsg, JsonRequestBehavior.AllowGet);
+            //return RedirectToAction("Create");
+            oInvoiceDetails.CardCode = oInvoiceDetails.CardCode ?? Request.Form["CustomerID"];
+            oInvoiceDetails.CardName = oInvoiceDetails.CardName ?? Request.Form["customerAutocomplete"];
+
+            custCode = oInvoiceDetails.CardCode ?? Request.Form["CustomerID"];
+
+            LoadDropdowns(custCode); // Load dropdowns again so page doesn't break
+
+            if (oInvoiceDetails.ItemDetailsListView == null)
+                oInvoiceDetails.ItemDetailsListView = new List<ItemDetails>();
+            return View(oInvoiceDetails);
+        }
+
+        public AssignedEmpModel GetSalesEmployeeInfoByUId(string empCode)
+
+        {
+
+            List<AssignedEmpModel> lstActTypes = new List<AssignedEmpModel>();
+
+            AssignedEmpModel valModel = new AssignedEmpModel();
+
+            try
+
+            {
+
+
+                string strSQL = "SELECT T2.\"SlpCode\", T2.\"SlpName\",T2.\"U_PDTUSERID\"  FROM OUSR T0  INNER JOIN OUDG T1 ON T0.\"DfltsGroup\" = T1.\"Code\" INNER JOIN OSLP T2 ON T1.\"SalePerson\" = T2.\"SlpCode\" where T0.\"USER_CODE\"='" + empCode + "'";
+
+                DataSet dsData = objHlpr.getDataSet(strSQL);
+
+                if (dsData.Tables[0].Rows.Count > 0)
+
+                {
+
+                    valModel.AssignedEmpId = Convert.ToInt32(dsData.Tables[0].Rows[0]["SlpCode"]);
+
+                    valModel.AssignedEmpName = dsData.Tables[0].Rows[0]["SlpName"].ToString();
+
+                    valModel.Memo = dsData.Tables[0].Rows[0]["SlpName"].ToString();
+
+                    var pdtuser = dsData.Tables[0].Rows[0]["U_PDTUSERID"].ToString();
+
+                    valModel.PDTUSERID = pdtuser.TrimStart('0');
+
+                    valModel.EmpName = dsData.Tables[0].Rows[0]["SlpName"].ToString(); //dsData.Tables[0].Rows[0]["firstName"].ToString() + " " + dsData.Tables[0].Rows[0]["middleName"].ToString() + " " + dsData.Tables[0].Rows[0]["lastName"].ToString();
+
+                    // lstActTypes.Add(valModel);
+
+                }
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+            }
+
+            return valModel;//Json(lstActTypes, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public JsonResult GetItemDetailsList(string fromDate, string toDate)
+        {
+            List<object> itemList = new List<object>();
+            DataSet ds = new DataSet();
+
+            try
+            {
+                // Use current month range if no dates provided
+                DateTime from = string.IsNullOrEmpty(fromDate)
+                    ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
+                    : DateTime.Parse(fromDate);
+
+                DateTime to = string.IsNullOrEmpty(toDate)
+                    ? new DateTime(DateTime.Now.Year, DateTime.Now.Month,
+                        DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month))
+                    : DateTime.Parse(toDate);
+
+                string sqlCon = ConfigurationManager.AppSettings["SqlCon"].ToString();
+                using (SqlConnection conn = new SqlConnection(sqlCon))
+                {
+
+                    string username = Session["USERNAME"].ToString();
+                    string query = "SELECT T0.\"DocEntry\", T0.\"DocNum\", T0.\"CardCode\", T0.\"CardName\", T0.\"NumAtCard\", " +
+                                   "T0.\"CreateDate\", T0.\"DocTotal\", T0.\"UserSign\", T1.\"U_NAME\" AS \"CreatedBy\", " +
+                                   "T2.\"USER_CODE\", SUM(T3.\"Quantity\") AS \"TotalQty\", T0.\"ObjType\" AS \"ObjectType\"," +
+                                   "(Case when T0.DocStatus ='O' then 'Open' when T0.DocStatus ='C' then 'Closed' else '' end ) as \"Status\" " +
+                                   "FROM \"OINV\" T0 INNER JOIN \"OUSR\" T1 ON T0.\"UserSign\" = T1.\"USERID\" " +
+                                   "LEFT JOIN \"OUSR\" T2 ON (T2.\"U_SUser\" = T1.\"USER_CODE\" OR T2.\"USER_CODE\" = T1.\"USER_CODE\") " +
+                                   "INNER JOIN \"INV1\" T3 ON T0.\"DocEntry\" = T3.\"DocEntry\" " +
+                                   "WHERE T0.\"CANCELED\" = 'N' AND T0.\"ObjType\" = '14' " +
+                                   "AND T2.\"USER_CODE\" = '" + username + "' " +
+                                   "AND T0.\"CreateDate\" BETWEEN '" + fromDate + "' AND '" + toDate + "' " +
+                                   "GROUP BY T0.\"DocEntry\", T0.\"DocNum\", T0.\"CardCode\", T0.\"CardName\", T0.\"NumAtCard\",T0.\"DocStatus\", " +
+                                   "T0.\"CreateDate\", T0.\"DocTotal\", T0.\"UserSign\", T1.\"U_NAME\", T2.\"USER_CODE\", T0.\"ObjType\" " +
+                                   "ORDER BY T0.\"DocEntry\" DESC";
+
+
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@FromDate", from);
+                        cmd.Parameters.AddWithValue("@ToDate", to);
+
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(ds);
+
+                        foreach (DataRow row in ds.Tables[0].Rows)
+                        {
+                            itemList.Add(new
+                            {
+                                DocEntry = Convert.ToInt32(row["DocEntry"]),
+                                DocNum = Convert.ToInt32(row["DocNum"]),
+                                CardCode = row["CardCode"].ToString(),
+                                CardName = row["CardName"].ToString(),
+                                NumAtCard = row["NumAtCard"].ToString(),
+                                CreateDate = Convert.ToDateTime(row["CreateDate"]).ToString("yyyy-MM-dd"),
+                                DocTotal = Convert.ToDecimal(row["DocTotal"]),
+                                CreatedBy = row["CreatedBy"].ToString(),
+                                TotalQty = Convert.ToInt32(row["TotalQty"]),
+                                Status = Convert.ToString(row["Status"])
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Optionally log error
+                Console.WriteLine(ex.Message);
+            }
+
+            return Json(new { data = itemList }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult CreditMemoDetails(int id)
+        {
+            ServiceLayerServices currentOdataService = (ServiceLayerServices)System.Web.HttpContext.Current.Application["sapAppGlobal"];
+
+            // Login if needed
+            currentOdataService = LoginLogoutAction(true);
+
+            var oInvoice = currentOdataService.GetSalesInvoices(id);
+
+            if (oInvoice == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Fetch names using services
+            string contactPersonName = currentOdataService.GetContactPersonName(oInvoice.CardCode, oInvoice.ContactPersonCode);
+            string paymentTermName = currentOdataService.GetPaymentTermName(oInvoice.PaymentGroupCode);
+            string salesEmployeeName = currentOdataService.GetSalesEmployeeName(oInvoice.SalesPersonCode);
+            string seriesName = currentOdataService.GetSeriesname(oInvoice.Series.Value);
+            // Mapping Document to SalesoInvoiceViewModel
+            SalesInvoiceModel SLSVIEW = new SalesInvoiceModel
+            {
+                CardCode = oInvoice.CardCode,
+                CardName = oInvoice.CardName,
+                RefNo = oInvoice.NumAtCard,
+                //contactPerson = oInvoice.ContactPersonCode.ToString(), // You may convert this to name if needed
+                //Paymentterms = oInvoice.PaymentGroupCode.ToString(),   // You may fetch the description if needed
+                contactPerson = contactPersonName,
+                Paymentterms = paymentTermName,
+                Shiptocode = oInvoice.ShipToCode,
+                Billtocode = oInvoice.PayToCode,
+                postingdate = oInvoice.DocDate ?? DateTime.MinValue,
+                ReqDate = oInvoice.DocDueDate ?? DateTime.MinValue,
+                LPODate = oInvoice.TaxDate ?? DateTime.MinValue,
+                seriesName = seriesName, //oInvoice.Series.Value,
+                Remarks = oInvoice.Comments,
+                //Salesemp = oInvoice.SalesPersonCode.ToString(), // Again, resolve name if needed
+                Salesemp = salesEmployeeName,
+                deliveryLocation = oInvoice.Address2,
+                DocNum = oInvoice.DocNum.Value,
+                TotalBeforeDiscount = currentOdataService.GetTotalInvoiceSum(Convert.ToInt32(oInvoice.DocEntry)),
+                DocDiscount = currentOdataService.GetTotalDiscSumInvoice(Convert.ToInt32(oInvoice.DocEntry)),
+                TotalTax = oInvoice.VatSum.HasValue ? (decimal?)oInvoice.VatSum.Value : null,
+                GrossTotal = oInvoice.DocTotal.HasValue ? (decimal?)oInvoice.DocTotal.Value : null,
+                ItemDetailsListView = oInvoice.DocumentLines.Select(line => new ItemDetails
+                {
+                    ItemName = line.ItemDescription,
+                    ItemCode = line.ItemCode,
+                    UomName = line.UoMCode,
+                    Qty = (decimal?)line.Quantity, // Safe and correct
+                    foc = currentOdataService.GetFOCValueDocument(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum), "Invoice"),
+                    focremarks = currentOdataService.GetFOCRemarksDocument(Convert.ToInt32(line.DocEntry), Convert.ToInt32(line.LineNum), "Invoice"),
+                    Price = (decimal?)line.UnitPrice,
+                    DisPer = (decimal)(line.DiscountPercent ?? 0),
+                    VatGrpCode = line.VatGroup,
+                    //VAT = line.VatGroup,
+
+                    LineTotal = (decimal)(line.LineTotal ?? 0),
+                    Warehouse = line.WarehouseCode,
+                    WhInstockQty = 0 // Optionally call service to get actual in-stock from warehouse
+                }).ToList()
+            };
+
+            return View(SLSVIEW);
+        }
+
         private void LoadDropdowns(string custCode)
 
 
@@ -117,7 +518,7 @@ namespace _10xErp.Controllers
             var seriesDocDict = new Dictionary<string, int>();
             int docNum = 0;
             string seriesId = string.Empty;
-            string query = "SELECT Series,SeriesName, ISNULL(NextNumber,0) as NextNumber FROM NNM1 WHERE ObjectCode = '13' and Indicator like '%" + DateTime.Now.Year.ToString() + "%' ";
+            string query = "SELECT Series,SeriesName, ISNULL(NextNumber,0) as NextNumber FROM NNM1 WHERE ObjectCode = '14' and Indicator like '%" + DateTime.Now.Year.ToString() + "%' ";
 
             DataSet ds = objHlpr.getDataSet(query);
             if (ds.Tables.Count > 0)
