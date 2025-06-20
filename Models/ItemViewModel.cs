@@ -155,7 +155,7 @@ namespace _10xErp.Models
     public class ProductDetailsModel
     {
 
-        public string Barcode { get; set; }
+        public string CodeBars { get; set; }
         public string ItemCode { get; set; }
         public string ItemName { get; set; }
         public int UomCode { get; set; }
@@ -163,7 +163,7 @@ namespace _10xErp.Models
         public string Qty { get; set; }
         public decimal Price { get; set; }
 
-        public string ItemGroup { get; set; }
+        public string ItmsGrpNam { get; set; }
         public string FrgnName { get; set; }
 
         public string Remarks { get; set; }

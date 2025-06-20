@@ -90,4 +90,25 @@ namespace __10xErp
         }
 
     }
+    public class ImageViewModel
+    {
+        public string BsImg { get; set; }
+        public Int32 DocNum { get; set; }
+        public string CardName { get; set; }
+
+    }
+    public class RSDBObj
+    {
+        public string CompanyDB { get; set; }
+        public string UserName { get; set; }
+        public string DBInstance { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class ActivityRptObj
+    {
+        public string name { get; set; }
+        public string type { get; set; }
+        public List<List<string>> value { get; set; }
+    }
 }

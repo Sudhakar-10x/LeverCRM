@@ -15,7 +15,11 @@ namespace _10xErp.Controllers
         // GET: BusinessPartner
         public ActionResult Index()
         {
-            List<CustomerModal> customersList = GetCustomerListList();
+            //List<CustomerModal> customersList = GetCustomerList();
+            List<CustomerModal> customersList = new List<CustomerModal>();
+
+
+           // ViewBag.Current = "Customer";
             return View(customersList);
         }
 
@@ -88,7 +92,7 @@ namespace _10xErp.Controllers
             return objCustomer;
         }
 
-        private List<CustomerModal> GetCustomerListList()
+        private List<CustomerModal> GetCustomerListOld()
         {
             List<CustomerModal> customersList = new List<CustomerModal>();
 
@@ -122,6 +126,47 @@ namespace _10xErp.Controllers
             }
 
             return customersList;
+        }
+
+
+        public JsonResult GetCustomerList()
+        {
+            List<CustomerModal> customersList = new List<CustomerModal>();
+
+            try
+            {
+                string strSQL = "SELECT distinct T0.\"CardCode\", T0.\"CardName\",T0.\"Phone1\", T0.\"Phone2\", T0.\"CntctPrsn\"," +
+                    " (select count(\"Address\") from CRD1 T1 Where T1.\"CardCode\"=T0.\"CardCode\" and T1.\"AdresType\"='B') as \"BillToCount\", "+
+                    " (select count(\"Address\") from CRD1 T1 Where T1.\"CardCode\"=T0.\"CardCode\" and T1.\"AdresType\"='s') as \"ShipToCount\" " +
+                    " FROM OCRD T0 order by T0.\"CardCode\"";
+                DataSet dsData = objHlpr.getDataSet(strSQL);
+
+                foreach (DataRow dr in dsData.Tables[0].Rows)
+                {
+                    CustomerModal obj = new CustomerModal()
+                    {
+                        CardCode = dr["CardCode"].ToString(),
+                        CardName = dr["CardName"].ToString(),
+                        Phone1 = dr["Phone1"].ToString(),
+                        Phone2 = dr["Phone2"].ToString(),
+                        ContactPerson = dr["CntctPrsn"].ToString()
+                    };
+                    //obj.lstShipToAddr = GetAddress(obj.CardCode, "S");
+                    //obj.lstBillToAddr = GetAddress(obj.CardCode, "B");
+                    //obj.ShipToCount = obj.lstShipToAddr?.Count ?? 0;
+                    //obj.BillToCount = obj.lstBillToAddr?.Count ?? 0;
+                    obj.BillToCount = (Convert.ToInt32(dr["BillToCount"].ToString())>0) ? Convert.ToInt32(dr["BillToCount"].ToString()) : 0 ;
+                    obj.ShipToCount = (Convert.ToInt32(dr["ShipToCount"].ToString()) > 0) ? Convert.ToInt32(dr["ShipToCount"].ToString()) : 0;
+                    customersList.Add(obj);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                ex.Message.ToString();
+            }
+
+            return Json(new { data = customersList }, JsonRequestBehavior.AllowGet);
         }
 
         public List<BPAddressModel> GetAddress(string bpCardCode, string Addresstype)

@@ -6,6 +6,8 @@ using System.Web;
 using System.Web.Mvc;
 using _10xErp.Models;
 using _10xErp.Helpers;
+using System.Configuration;
+using System.Data.SqlClient;
 
 namespace _10xErp.Controllers
 {
@@ -15,8 +17,15 @@ namespace _10xErp.Controllers
         // GET: Product
         public ActionResult Index()
         {
-            List<ProductDetailsModel> productsList = GetProductList();
+            //List<ProductDetailsModel> productsList = GetProductList();
+
+            List<ProductDetailsModel> productsList = new List<ProductDetailsModel>();
+
+
+            ViewBag.Current = "Product";
             return View(productsList);
+
+
         }
 
         public ActionResult ViewProductDetails(string itemCode)
@@ -27,7 +36,7 @@ namespace _10xErp.Controllers
             return View(productDetails);
         }
 
-        private List<ProductDetailsModel> GetProductList()
+        private List<ProductDetailsModel> GetProductListOLD()
         {
             List<ProductDetailsModel> lstItems = new List<ProductDetailsModel>();
 
@@ -47,8 +56,8 @@ namespace _10xErp.Controllers
                     {
 
                         ItemCode = dr["ItemCode"].ToString(),
-                        Barcode = dr["CodeBars"].ToString(),
-                        ItemGroup = dr["ItmsGrpNam"].ToString(),
+                        CodeBars = dr["CodeBars"].ToString(),
+                        ItmsGrpNam = dr["ItmsGrpNam"].ToString(),
                         ItemName = DBNull.Value.Equals(dr["ItemName"]) ? "" : dr["ItemName"].ToString()
                     };
                     docObj.lstInvDetails = GetInventoryDetails(dr["ItemCode"].ToString());
@@ -68,6 +77,49 @@ namespace _10xErp.Controllers
 
 
             return lstItems;
+        }
+
+        public JsonResult GetProductList()
+        {
+            List<ProductDetailsModel> itemList = new List<ProductDetailsModel>();
+            DataSet ds = new DataSet();
+
+            try
+            {
+                string sqlCon = ConfigurationManager.AppSettings["SqlCon"].ToString();
+                using (SqlConnection conn = new SqlConnection(sqlCon))
+                {
+                    var query = "select distinct T1.\"ItemCode\", T1.\"ItemName\", T5.\"ItmsGrpNam\", T1.\"CodeBars\" " +
+                    " from OITM T1 Inner join OBCD T0 on T0.\"ItemCode\"=T1.\"ItemCode\" " +
+                    " Inner Join OITB T5 on T5.\"ItmsGrpCod\"=T1.\"ItmsGrpCod\" " +
+                    " left JOIN ITM2 T3 on T3.\"ItemCode\"=T1.\"ItemCode\" where T1.\"validFor\"='Y' order by T1.\"ItemCode\" ";
+
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(ds);
+
+                        foreach (DataRow row in ds.Tables[0].Rows)
+                        {
+                            itemList.Add(new ProductDetailsModel
+                            {
+                                ItemCode = row["ItemCode"].ToString(),
+                                ItemName = row["ItemName"].ToString(),
+                                ItmsGrpNam = row["ItmsGrpNam"].ToString(),
+                                CodeBars = row["CodeBars"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Optionally log error
+                Console.WriteLine(ex.Message);
+            }
+
+            return Json(new { data = itemList }, JsonRequestBehavior.AllowGet);
         }
 
         public ProductDetailsModel GetProductDetails(string itemCode)
@@ -104,8 +156,8 @@ namespace _10xErp.Controllers
                     {
 
                         ItemCode = dr["ItemCode"].ToString(),
-                        Barcode = dr["CodeBars"].ToString(),
-                        ItemGroup = dr["ItmsGrpNam"].ToString(),
+                        CodeBars = dr["CodeBars"].ToString(),
+                        ItmsGrpNam = dr["ItmsGrpNam"].ToString(),
                         //WhsCode = dr["WhsCode"].ToString(),
                         //WhsName = dr["WhsName"].ToString(),
                         ItemName = DBNull.Value.Equals(dr["ItemName"]) ? "" : dr["ItemName"].ToString(),
