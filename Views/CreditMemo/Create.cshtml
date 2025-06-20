@@ -1,6 +1,6 @@
 ﻿@model _10xErp.Models.SalesInvoiceModel
 @{
-    ViewBag.Title = "Create Sales Invoice";
+    ViewBag.Title = "Create AR Credit Memo";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -47,11 +47,11 @@
         <div class="col-lg-12">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Sales Order</h5>
+                    <h5>AR Credit Note</h5>
                 </div>
                 <div class="ibox-content">
 
-                    @using (Html.BeginForm("InvoiceCreate", "Invoice", FormMethod.Post))
+                    @using (Html.BeginForm("Create", "CreditMemo", FormMethod.Post))
                     {
                         @Html.AntiForgeryToken()
                         <div class="row">
@@ -296,7 +296,7 @@
                                 </div>-->
                                 <div class="form-group row">
                                     <div class="col-sm-12 text-right">
-                                        <button type="submit" class="btn btn-success">Generate Sales Invoice</button>
+                                        <button type="submit" class="btn btn-success">Generate AR Credit Memo</button>
                                     </div>
                                 </div>
                             </div>
@@ -347,7 +347,7 @@
         $(document).on('click', '.select-item2', function () {
             selectedRowIndex = $(this).data('rowindex');
             $.ajax({
-                url:  '@Url.Action("ItemSearchGrid",  "Invoice")',
+                url:  '@Url.Action("ItemSearchGrid",  "CreditMemo")',
                 type: 'GET',
                 success: function (res) {
                     $('#itemsearch-form-modal .modal-body').html(res);
@@ -399,7 +399,7 @@
             selectedRowIndex = $(this).data('rowindex');
 
             $.ajax({
-                url:  '@Url.Action("ItemGrid",  "Invoice")',
+                url:  '@Url.Action("ItemGrid",  "CreditMemo")',
                 type: 'GET',
                 success: function (res) {
                     $('#itemsearch-form-modal .modal-body').html(res);
@@ -415,7 +415,7 @@
 
         $('#btnSelectCustomer').on('click', function () {
                     const customerType = 'C'; // $('input[name="entity.CallType"]:checked').val(); // or any other relevant ID
-            const baseUrl = '@Url.Action("CustomerGrid",  "Invoice")'; // Update with your actual action/controller
+            const baseUrl = '@Url.Action("CustomerGrid",  "CreditMemo")'; // Update with your actual action/controller
             const title = "Select Customer";
 
             showSearchInPopup(baseUrl, title, customerType);
@@ -464,7 +464,7 @@
             selectedRowIndex = indx;
 
             $.ajax({
-                url: "@Url.Action("GetNewItemRow",  "Invoice")" + "/" + indx,
+                url: "@Url.Action("GetNewItemRow",  "CreditMemo")" + "/" + indx,
                 method: 'GET',
                 success: function (response) {
                     $('#tbladdress tbody').append(response);
@@ -493,7 +493,7 @@
 
             //this is for dropdow customer seliction
             $.ajax({
-            url: '@Url.Action("GetCustomerListForDropDown",  "Invoice")',
+            url: '@Url.Action("GetCustomerListForDropDown",  "CreditMemo")',
             type: 'GET',
             data: {
                 customertype: 'C',
@@ -576,7 +576,7 @@
                  var row = $(this).closest('tr');
                 if (barcode) {
                      $.ajax({
-                         url:  '@Url.Action("GetItemDetailsbyBarcode",  "Invoice")',
+                         url:  '@Url.Action("GetItemDetailsbyBarcode",  "CreditMemo")',
                          type: 'GET',
                          data: { barcode: barcode },
                          success: function (item) {
@@ -689,7 +689,7 @@
 
                 if (keyword.length > 4) {
                     $.ajax({
-                        url:  '@Url.Action("SearchItemNames",  "Invoice")',
+                        url:  '@Url.Action("SearchItemNames",  "CreditMemo")',
                         type: 'GET',
                         data: { term: keyword },
                         success: function (response) {
@@ -763,7 +763,7 @@
                     minimumInputLength: 4,
                     allowClear: true,
                     ajax: {
-                        url:  '@Url.Action("SearchItems",  "Invoice")',
+                        url:  '@Url.Action("SearchItems",  "CeditMemo")',
                         dataType: 'json',
                         delay: 250,
                         data: function (params) {
@@ -789,7 +789,7 @@
 
                 if (isInitialLoad && selectedValue) {
                     $.ajax({
-                        url:  '@Url.Action("GetItemName",  "Invoice")',
+                        url:  '@Url.Action("GetItemName",  "CreditMemo")',
                         data: { id: selectedValue },
                         success: function (item) {
                             if (item) {
@@ -806,7 +806,7 @@
                 var row = $(this).closest('tr');
                 if (itemCode) {
                     $.ajax({
-                        url:  '@Url.Action("GetItemDetails",  "Invoice")',
+                        url:  '@Url.Action("GetItemDetails",  "CreditMemo")',
                         type: 'GET',
                         data: { itemCode: itemCode },
                         success: function (item) {
@@ -1091,7 +1091,7 @@ contactDropdown.append($('<option>', {
         function onItemSelected2(itemCode) {
 
         $.ajax({
-        url:  '@Url.Action("GetItemDetails",  "Invoice")',
+        url:  '@Url.Action("GetItemDetails",  "CreditMemo")',
         type: 'GET',
         data: { itemCode: itemCode },
             success: function (item) {

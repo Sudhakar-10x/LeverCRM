@@ -251,7 +251,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\CreditMemo\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css.map" />
@@ -340,14 +339,12 @@
     <Content Include="Views\Purchase\Index.cshtml" />
     <Content Include="Views\Purchase\Create.cshtml" />
     <Content Include="Views\Purchase\PurchaseOrderDetails.cshtml" />
-
     <EmbeddedResource Include="Views\Invoice\Index.cshtml" />
     <EmbeddedResource Include="Views\Invoice\SalesInvoiceDetails.cshtml" />
-
     <Content Include="Views\CreditMemo\GetNewItemRow.cshtml" />
     <Content Include="Views\CreditMemo\Create.cshtml" />
     <Content Include="Views\CreditMemo\ItemGrid.cshtml" />
-
+    <Content Include="Views\CreditMemo\Index.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -367,7 +364,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>52943</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:52947/</IISUrl>
+          <IISUrl>http://localhost:52948/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
