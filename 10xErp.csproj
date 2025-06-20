@@ -276,7 +276,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\CreditMemo\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css.map" />
@@ -370,6 +369,7 @@
     <Content Include="Views\CreditMemo\GetNewItemRow.cshtml" />
     <Content Include="Views\CreditMemo\Create.cshtml" />
     <Content Include="Views\CreditMemo\ItemGrid.cshtml" />
+    <Content Include="Views\CreditMemo\Index.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
