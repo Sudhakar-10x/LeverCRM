@@ -321,8 +321,13 @@ namespace _10xErp.Models
         public decimal? DocDiscount { get; set; }
         public decimal? TotalTax { get; set; }
         public decimal? GrossTotal { get; set; }
-        public decimal? FinalTotal { get; set; }
 
+        public decimal? CashTotal { get; set; }
+        public decimal? CardTotal { get; set; }
+        public decimal? CreditTotal { get; set; }
+        public decimal? OtherTotal { get; set; }
+        public decimal? FinalTotal { get; set; }
+        public int DocEntry { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //if (string.IsNullOrWhiteSpace(CardName))

@@ -17,6 +17,7 @@ using System.IO;
 using __10xErp;
 using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
+using System.Globalization;
 
 namespace _10xErp.Controllers
 {
@@ -124,24 +125,68 @@ namespace _10xErp.Controllers
         }
 
         [HttpPost]
-        public void ExportReportToPDF()
+        public ActionResult ExportReportToPDF(
+            string FromCustomerCode,
+            string ToCustomerCode,
+            string FromSalesPersonCode,
+            string ToSalesPersonCode,
+            string AsOnDate)
         {
             ReportDocument reportDoc = new ReportDocument();
-            string reportPath = Server.MapPath("~/Reports/Outstanding Statement New.rpt");
-            reportDoc.Load(reportPath);
+            //string reportPath = Server.MapPath("~/Reports/Outstanding Statement New.rpt");
+            string reportPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "Outstanding Statement.rpt");
 
-            reportDoc.SetDatabaseLogon("dbUser", "dbPassword");
+            string sqlCon = System.Configuration.ConfigurationManager.AppSettings.Get("SqlCon").ToString();
+            using (SqlConnection conn = new SqlConnection(sqlCon))
+            {
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    TableLogOnInfo crTableLogOnInfo = new TableLogOnInfo();
+                    CrystalDecisions.CrystalReports.Engine.Tables crTables;
+                    ReportDocument cryRpt = new ReportDocument();
 
-            // Export to PDF
-            MemoryStream stream = (MemoryStream)reportDoc.ExportToStream(ExportFormatType.PortableDocFormat);
-            Response.Clear();
-            Response.ContentType = "application/pdf";
-            Response.AddHeader("content-disposition", "inline; filename=Report.pdf");
-            Response.BinaryWrite(stream.ToArray());
-            Response.End();
+                    try
+                    {
+                        reportDoc.Load(reportPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Error loading report: " + ex.Message + " at path: " + reportPath);
+                    }
 
-            reportDoc.Close();
-            reportDoc.Dispose();
+
+                    ConnectionInfo crConnectionInfo = new ConnectionInfo
+                    {
+                        ServerName = ConfigurationManager.AppSettings["Server"],
+                        DatabaseName = ConfigurationManager.AppSettings["CompanyDB"],
+                        UserID = ConfigurationManager.AppSettings["DBUserId"],
+                        Password = ConfigurationManager.AppSettings["DBPassword"]
+                    };
+                    foreach (CrystalDecisions.CrystalReports.Engine.Table table in reportDoc.Database.Tables)
+                    {
+                        TableLogOnInfo tableLogOnInfo = table.LogOnInfo;
+                        tableLogOnInfo.ConnectionInfo = crConnectionInfo;
+                        table.ApplyLogOnInfo(tableLogOnInfo);
+                    }
+                    reportDoc.SetParameterValue("Fromcust", FromCustomerCode);
+                    reportDoc.SetParameterValue("FromSlp", FromSalesPersonCode);
+                    reportDoc.SetParameterValue("ToCust", ToCustomerCode);
+                    reportDoc.SetParameterValue("ToSlp", ToSalesPersonCode);
+                    DateTime parsedDate = DateTime.ParseExact(AsOnDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    reportDoc.SetParameterValue("TD", parsedDate);
+                    
+                    
+
+                    // Export to PDF
+                    Stream stream = reportDoc.ExportToStream(ExportFormatType.PortableDocFormat);
+                    reportDoc.Close();
+                    reportDoc.Dispose();
+
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return File(stream, "application/pdf", "OutstandingStatement.pdf");
+                }
+            }
+                   
         }
     }
 }

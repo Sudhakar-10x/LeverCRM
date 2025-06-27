@@ -9,7 +9,11 @@ using _10xErp.Helpers;
 using System.Data.SqlClient;
 using System.Configuration;
 using _10xErp.ServiceReferenceLayer.SAPB1;
+using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
 using Newtonsoft.Json;
+using System.IO;
+using System.Globalization;
 
 namespace _10xErp.Controllers
 {
@@ -256,7 +260,6 @@ namespace _10xErp.Controllers
                     {
                         if (oInvoiceDetails.ItemDetailsListView != null)
                         {
-
                             string strCurrentServiceURL = ConfigurationManager.AppSettings["CurrentServiceURL"]; 
 
                             currentOdataService = (ServiceLayerServices)System.Web.HttpContext.Current.Application["sapAppGlobal"];
@@ -272,7 +275,7 @@ namespace _10xErp.Controllers
                             oSeleInvReqst.ReqType = 12;
                             // EmpID, Manag
                             oSeleInvReqst.DocObjectCode = "13";
-                            oSeleInvReqst.SeriesString = "";
+                            //oSeleInvReqst.SeriesString = "";
                             oSeleInvReqst.Series = oInvoiceDetails.series;
                             oSeleInvReqst.DocNum = oInvoiceDetails.DocNum;
                             oSeleInvReqst.CardCode = oInvoiceDetails.CardCode;
@@ -292,7 +295,9 @@ namespace _10xErp.Controllers
                             oSeleInvReqst.U_InsPer = oInvoiceDetails.InsPer;
                             oSeleInvReqst.U_InsAmt = oInvoiceDetails.InsAmt;
                             oSeleInvReqst.U_Contact = oInvoiceDetails.Patient;
-
+                            oSeleInvReqst.U_CashAmt = Convert.ToDouble(oInvoiceDetails.CashTotal).ToString();
+                            oSeleInvReqst.U_CardAmt = Convert.ToDouble(oInvoiceDetails.CardTotal).ToString();
+                            oSeleInvReqst.U_CredAmt = Convert.ToDouble(oInvoiceDetails.CreditTotal).ToString();
                             oSeleInvReqst.U_IsFrmPrtal = "Y";
                             oSeleInvReqst.ContactPersonCode = !string.IsNullOrEmpty(oInvoiceDetails.contactPerson) ? 0 : Convert.ToInt32(oInvoiceDetails.contactPerson);
                             //oSeleInvReqst.U_PDTUSER = oInvoiceDetails.EmpID;
@@ -308,12 +313,12 @@ namespace _10xErp.Controllers
                             //}
 
                             //oSeleInvReqst.Series = 8;
-                            var seObj = GetSalesEmployeeInfoByUId(oInvoiceDetails.EmpID);
+                            //var seObj = GetSalesEmployeeInfoByUId(oInvoiceDetails.EmpID);
                             oSeleInvReqst.BPL_IDAssignedToInvoice = Convert.ToInt32(oInvoiceDetails.BranchId);
                             oSeleInvReqst.PaymentGroupCode = Convert.ToInt32(oInvoiceDetails.Paymentterms);
-                            //oSeleInvReqst.NumAtCard = oInvoiceDetails.CustRefNo;
+                            ////oSeleInvReqst.NumAtCard = oInvoiceDetails.CustRefNo;
                             oSeleInvReqst.DiscountPercent = Convert.ToDouble(oInvoiceDetails.DocDiscount);
-                            oSeleInvReqst.SalesPersonCode = seObj.AssignedEmpId;
+                            //oSeleInvReqst.SalesPersonCode = seObj.AssignedEmpId;
                             oSeleInvReqst.ShipToCode = oInvoiceDetails.Shiptocode;
                             oSeleInvReqst.PayToCode = oInvoiceDetails.Billtocode;
                             oSeleInvReqst.SalesPersonCode = Convert.ToInt32(oInvoiceDetails.Salesemp);
@@ -363,7 +368,7 @@ namespace _10xErp.Controllers
                                 oLine.UnitPrice = Convert.ToDouble(itm.Price);
                                 oLine.DiscountPercent = Convert.ToDouble(itm.DisPer);
 
-                                
+
                                 oSeleInvReqst.DocumentLines.Add(oLine);
 
 
@@ -377,10 +382,23 @@ namespace _10xErp.Controllers
                             //var email = this.getCustomerEmail(oInvoiceDetails.CardCode);
                             //SendCodeToEmail("raju.m432@gmail.com", msg);
                             //UpdateRequestTime();
+                            oInvoiceDetails.DocEntry = doc.DocEntry; 
+                            int InvoiceEntry = doc.DocEntry;
                             cnfMsg.IsSucess = true;
-                            cnfMsg.CnfsMsg = "Sales Invoice  Document Number :" + doc.DocNum + " Created Sucessfully";
-                            TempData["SuccessMessage"] = "Sales Invoice  Document Number :" + doc.DocNum + " Created Sucessfully";
-                            return RedirectToAction("InvoiceCreate");
+                            cnfMsg.CnfsMsg = "Sales Invoice  Document Number :" + doc.DocNum + " Created Successfully";
+                            TempData["SuccessMessage"] = "Sales Invoice  Document Number :" + doc.DocNum + " Created Successfully";
+                            //return RedirectToAction("InvoiceCreate");
+                            oInvoiceDetails.CardCode = oInvoiceDetails.CardCode ?? Request.Form["CustomerID"];
+                            oInvoiceDetails.CardName = oInvoiceDetails.CardName ?? Request.Form["customerAutocomplete"];
+
+                            custCode = oInvoiceDetails.CardCode ?? Request.Form["CustomerID"];
+
+                            LoadDropdowns(custCode); // Load dropdowns again so page doesn't break
+
+                            if (oInvoiceDetails.ItemDetailsListView == null)
+                                oInvoiceDetails.ItemDetailsListView = new List<ItemDetails>();
+                            ExportReportToPDF(InvoiceEntry);
+                            return View(oInvoiceDetails);
                         }
                         else
                             TempData["ErrorMessage"] = "Make sure correct data to generate sales order !!";
@@ -452,6 +470,57 @@ namespace _10xErp.Controllers
             return View(oInvoiceDetails);
         }
 
+        public ActionResult ExportReportToPDF(int DocEntry)
+        {
+            ReportDocument reportDoc = new ReportDocument();
+            //string reportPath = Server.MapPath("~/Reports/Outstanding Statement New.rpt");
+            string reportPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports", "AR Invoice.rpt");
+
+            string sqlCon = System.Configuration.ConfigurationManager.AppSettings.Get("SqlCon").ToString();
+            using (SqlConnection conn = new SqlConnection(sqlCon))
+            {
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    TableLogOnInfo crTableLogOnInfo = new TableLogOnInfo();
+                    CrystalDecisions.CrystalReports.Engine.Tables crTables;
+                    ReportDocument cryRpt = new ReportDocument();
+
+                    try
+                    {
+                        reportDoc.Load(reportPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Error loading report: " + ex.Message + " at path: " + reportPath);
+                    }
+
+
+                    ConnectionInfo crConnectionInfo = new ConnectionInfo
+                    {
+                        ServerName = ConfigurationManager.AppSettings["Server"],
+                        DatabaseName = ConfigurationManager.AppSettings["CompanyDB"],
+                        UserID = ConfigurationManager.AppSettings["DBUserId"],
+                        Password = ConfigurationManager.AppSettings["DBPassword"]
+                    };
+                    foreach (CrystalDecisions.CrystalReports.Engine.Table table in reportDoc.Database.Tables)
+                    {
+                        TableLogOnInfo tableLogOnInfo = table.LogOnInfo;
+                        tableLogOnInfo.ConnectionInfo = crConnectionInfo;
+                        table.ApplyLogOnInfo(tableLogOnInfo);
+                    }
+                    reportDoc.SetParameterValue("Dockey@", DocEntry);
+
+                    // Export to PDF
+                    Stream stream = reportDoc.ExportToStream(ExportFormatType.PortableDocFormat);
+                    reportDoc.Close();
+                    reportDoc.Dispose();
+
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return File(stream, "application/pdf", "Invoice.pdf");
+                }
+            }
+
+        }
 
         //[HttpPost]
         //[ValidateAntiForgeryToken]
@@ -1250,7 +1319,7 @@ namespace _10xErp.Controllers
             try
             {
                 // Ensure the partial view exists and the model is valid
-                return PartialView("~/Views/Shared/_ItemRow.cshtml", new ItemDetails { Index = id });
+                return PartialView("~/Views/Shared/_BatchItemRow.cshtml", new ItemDetails { Index = id });
             }
             catch (Exception ex)
             {
@@ -1263,7 +1332,7 @@ namespace _10xErp.Controllers
 
         public ActionResult _ItemRow(ItemDetails address)
         {
-            return PartialView("~/Views/Shared/_ItemRow", address);
+            return PartialView("~/Views/Shared/_BatchItemRow.cshtml", address);
         }
 
 

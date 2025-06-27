@@ -4,73 +4,64 @@
         <div class="col-lg-12">
             <div class="ibox">
                 <div class="ibox-content">
-                    <form id="LoadReportForm" enctype="multipart/form-data">
-                    <div class="form-group row align-items-center">
-                        <div>
-                            <label for="txtMulti" class="col-sm-3 col-form-label">Test Multiple :</label>
-                            <select class="js-example-basic-multiple" name="states[]" multiple="multiple" id="txtMulti" style="width: 250px;">
-                                <option value="1">Option A</option>
-                                <option value="2">Option B</option>
-                                <option value="3">Option C</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group row align-items-center">
-                        <label for="frmCust" class="col-sm-3 col-form-label">Customer from :</label>
-                        <div class="col-sm-3">
+                    <form id="LoadReportForm" method="post" action="@Url.Action("ExportReportToPDF", "OutStanding")" target="_blank">
+                        <div class="form-group row align-items-center">
+                            <label for="frmCust" class="col-sm-3 col-form-label">Customer from :</label>
+                            <div class="col-sm-3">
                                 @*<input type="text" id="frmCust" class="form-control" />*@
                                 <input type="text" id="FrmcustomerAutocomplete" class="form-control"
                                        name="Frmcustomer"
                                        @*value="@(string.IsNullOrEmpty(Model?.CardName) ? "" : Model.CardName)"*@
                                        placeholder="Start typing customer name..." />
 
-                                <input type="hidden" id="Frmselected" name="FrmCustomerID" />
+                                <input type="hidden" id="hdnFromCustomerCode" name="FromCustomerCode" />
                                 @*value="@Model?.CardCode"*@
-                        </div>
-                        <label for="toCust" class="col-sm-1 col-form-label">To :</label>
-                        <div class="col-sm-3">
+                            </div>
+                            <label for="toCust" class="col-sm-1 col-form-label">To :</label>
+                            <div class="col-sm-3">
                                 @*<input type="text" id="toCust" class="form-control" />*@
                                 <input type="text" id="TocustomerAutocomplete" class="form-control"
                                        name="Frmcustomer"
                                        @*value="@(string.IsNullOrEmpty(Model?.CardName) ? "" : Model.CardName)"*@
                                        placeholder="Start typing customer name..." />
 
-                                <input type="hidden" id="Toselected" name="ToCustomerID" />
+                                <input type="hidden" id="hdnToCustomerCode" name="ToCustomerCode" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row align-items-center">
-                        <label for="toCust" class="col-sm-3 col-form-label">Sales Employee From :</label>
-                        <div class="col-sm-3">
+                        <div class="form-group row align-items-center">
+                            <label for="toCust" class="col-sm-3 col-form-label">Sales Employee From :</label>
+                            <div class="col-sm-3">
                                 @*<input type="text" id="frmSlp" class="form-control" />*@
                                 <input type="text" id="FrmSlpAutocomplete" class="form-control"
                                        name="FrmSlp"
                                        @*value="@(string.IsNullOrEmpty(Model?.CardName) ? "" : Model.CardName)"*@
                                        placeholder="Start typing Sales Employee name..." />
 
-                                <input type="hidden" id="FrmSlpselected" name="FrmSlpID" />
-                        </div>
-                        <label for="toSlp" class="col-sm-1 col-form-label">To :</label>
-                        <div class="col-sm-3">
+                                <input type="hidden" id="hdnFromSalesPersonCode" name="FromSalesPersonCode" />
+                            </div>
+                            <label for="toSlp" class="col-sm-1 col-form-label">To :</label>
+                            <div class="col-sm-3">
                                 @*<input type="text" id="toSlp" class="form-control" />*@
                                 <input type="text" id="ToSlpAutocomplete" class="form-control"
                                        name="ToSlp"
                                        @*value="@(string.IsNullOrEmpty(Model?.CardName) ? "" : Model.CardName)"*@
                                        placeholder="Start typing Sales Employee name..." />
 
-                                <input type="hidden" id="ToSlpselected" name="ToSlpID" />
+                                <input type="hidden" id="hdnToSalesPersonCode" name="ToSalesPersonCode" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row align-items-center">
-                        <label for="fromDate" class="col-sm-3 col-form-label">As on Date : </label>
-                        <div class="col-sm-3">
-                            <input type="date" id="fromDate" class="form-control" />
-                        </div>
-                        <div class="col-sm-4">
+                        <div class="form-group row align-items-center">
+                            <label for="fromDate" class="col-sm-3 col-form-label">As on Date : </label>
+                            <div class="col-sm-3">
+                                <input type="date" id="AsOnDate" class="form-control" />
+                                <input type="hidden" id="hdnAsOnDate" name="AsOnDate" />
+                            </div>
+                            <div class="col-sm-4">
                                 @*<button id="loadDataBtn" class="btn btn-primary">Load</button>*@
-                                <button type="submit" class="btn btn-success" onclick="ExportReportToPDF()">Load Report</button>
+                                <button type="button" class="btn btn-success" onclick="ExportReportToPDF()">Load Report</button>
+
+                            </div>
                         </div>
-                    </div>
                     </form>
                 </div>
 
@@ -97,9 +88,9 @@
 @section scripts {
 
     @*<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>*@
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>*@
     <script type="text/javascript">
 
         $(document).ready(function () {
@@ -120,7 +111,7 @@
         },
             select: function (event, ui) {
                 //console.log(ui);
-            $("#Frmselected").val(ui.item.id);
+                $("#hdnFromCustomerCode").val(ui.item.id);
             localStorage.setItem("Frmselected", ui.item.id);
             localStorage.setItem("FrmselectedCustomerName", ui.item.value);
         }
@@ -140,7 +131,7 @@
             });
         },
         select: function (event, ui) {
-            $("#Toselected").val(ui.item.id);
+            $("#hdnToCustomerCode").val(ui.item.id);
             localStorage.setItem("Toselected", ui.item.id);
             localStorage.setItem("ToselectedCustomerName", ui.item.value);
         }
@@ -162,7 +153,7 @@
             });
         },
              select: function (event, ui) {
-                 $("#FrmSlpselected").val(ui.item.id);
+                 $("#hdnFromSalesPersonCode").val(ui.item.id);
                  localStorage.setItem("FrmSlpselected", ui.item.id);
                  localStorage.setItem("FrmSlpselectedSlpName", ui.item.value);
         }
@@ -182,7 +173,7 @@
             });
         },
         select: function (event, ui) {
-            $("#ToSlpselected").val(ui.item.id);
+            $("#hdnToSalesPersonCode").val(ui.item.id);
             localStorage.setItem("ToSlpselected", ui.item.id);
             localStorage.setItem("ToSlpselectedSlpName", ui.item.value);
         }
@@ -196,90 +187,12 @@
 
             // ✅ Set default dates on page load
             const defaults = getDefaultDateRange();
-            $('#fromDate').val(defaults.fromDate);
+            $('#AsOnDate').val(defaults.fromDate);
             $('#toDate').val(defaults.toDate);
             @*var baseUrl = '@Url.Action("SalesOrderDetails", "SalesOrder", new { id = "__docEntry__" })';
             var docEntry = row.DocEntry;
             var finalUrl = baseUrl.replace('__docEntry__', docEntry);*@
 
-            const detailsUrlTemplate = '@Url.Action("SalesOrderDetails", "SalesOrder", new { id = "__id__" })';
-
-
-            // Result: /SalesOrder/SalesOrderDetails/123
-
-            var table = $('#itemTable').DataTable({
-                ajax: {
-                    url: '@Url.Action("GetItemDetailsList", "SalesOrder")',
-                    data: function (d) {
-                        let fromDate = $('#fromDate').val();
-                        let toDate = $('#toDate').val();
-
-                        if (!fromDate || !toDate) {
-                            const defaults = getDefaultDateRange();
-                            fromDate = defaults.fromDate;
-                            toDate = defaults.toDate;
-                        }
-
-                        d.fromDate = fromDate;
-                        d.toDate = toDate;
-                    }
-                },
-                columns: [
-                    { data: null },
-                    { data: 'DocNum', className: 'text-right' },
-                    { data: 'DocEntry', className: 'text-right' },
-                    { data: 'CardCode', className: 'text-right' },
-                    { data: 'CardName', className: 'text-left' },
-                    { data: 'NumAtCard', className: 'text-left' },
-                    {
-                        data: 'CreateDate',
-                        className: 'text-right',
-                        render: function (data) {
-                            return data ? moment(data).format('YYYY-MM-DD') : '';
-                        }
-                    },
-                    {
-                        data: 'DocTotal',
-                        className: 'text-right',
-                        render: $.fn.dataTable.render.number(',', '.', 2, '')
-                    },
-                    { data: 'CreatedBy', className: 'text-left' },
-                    { data: 'TotalQty', className: 'text-right' },
-                    { data: 'Status', className: 'text-left' },
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center',
-                        render: function (data, type, row) {
-                            const detailsUrl = detailsUrlTemplate.replace('__id__', row.DocEntry);
-                            return `<a href="${detailsUrl}" title="View Details"><i class="fa fa-eye"></i></a>`;
-                        }
-                    }
-                ],
-                order: [[1, 'desc']],
-                responsive: true,
-                autoWidth: false,
-                scrollX: true,
-                scrollY: '400px',
-                scrollCollapse: true,
-                language: {
-                    emptyTable: "No records available"
-                },
-                initComplete: function () {
-                    this.api().columns.adjust();
-                },
-                drawCallback: function () {
-                    var api = this.api();
-                    var pageInfo = api.page.info();
-                    api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
-                        cell.innerHTML = pageInfo.start + i + 1;
-                    });
-
-                    // Adjust columns on every draw
-                    api.columns.adjust();
-                }
-            });
 
             // ✅ Load button functionality
             $('#loadDataBtn').click(function () {
@@ -288,27 +201,77 @@
                 //table.ajax.reload(null, false); // retain pagination
             });
 
-            // ✅ Responsive column adjustment on various events
-            $(window).on('resize', function () {
-                table.columns.adjust();
-            });
-
-            // On pagination
-            table.on('page.dt', function () {
-                table.columns.adjust();
-            });
-
-            // On search
-            table.on('search.dt', function () {
-                table.columns.adjust();
-            });
-
-            // On ordering
-            table.on('order.dt', function () {
-                table.columns.adjust();
-            });
         });
-    function ExportReportToPDF() {
+        function ExportReportToPDF() {
+            // Optional: set values into hidden fields before submit if needed
+            // $('#FromCustomerID').val($('#FromCustomerSelect').val());
+            //$('#hdnFromCustomerCode').val($('#FrmcustomerAutocomplete').val());
+            //$('#hdnToCustomerCode').val($('#TocustomerAutocomplete').val());
+            //$('#hdnFromSalesPersonCode').val($('#FrmSlpAutocomplete').val());
+            //$('#hdnToSalesPersonCode').val($('#ToSlpAutocomplete').val());
+            $('#hdnAsOnDate').val($('#AsOnDate').val());
+
+            $('#LoadReportForm').submit(); // Submit the form to the controller
+            setTimeout(function () {
+                clearFormFields();
+            }, 2000);
+        }
+        function ExportReportToPDFOlder() {
+            // Set hidden fields before submitting
+            $('#hdnFromCustomerCode').val($('#FromCustomerCode').val());
+            $('#hdnToCustomerCode').val($('#ToCustomerCode').val());
+            $('#hdnFromSalesPersonCode').val($('#FromSalesPersonCode').val());
+            $('#hdnToSalesPersonCode').val($('#ToCustomerCode').val());
+            $('#hdnAsOnDate').val($('#AsOnDate').val());
+
+            // Submit the form (opens PDF in new tab)
+            $('#LoadReportForm').submit();
+
+            // Clear the form after a short delay (enough time for PDF to trigger)
+            setTimeout(function () {
+                clearFormFields();
+            }, 2000);
+        }
+
+        function clearFormFields() {
+            // Clear visible inputs
+            $('#FrmcustomerAutocomplete').val('');
+            $('#TocustomerAutocomplete').val('');
+            $('#FrmSlpAutocomplete').val('');
+            $('#ToSlpAutocomplete').val('');
+            //$('#AsOnDate').val('');
+
+            // Clear hidden fields
+            $('#hdnFromCustomerCode').val('');
+            $('#hdnToCustomerCode').val('');
+            $('#hdnFromSalesPersonCode').val('');
+            $('#hdnToSalesPersonCode').val('');
+            //$('#hdnAsOnDate').val('');
+
+            // Optional: remove values from localStorage if needed
+            localStorage.removeItem("Frmselected");
+            localStorage.removeItem("FrmselectedCustomerName");
+            localStorage.removeItem("Toselected");
+            localStorage.removeItem("ToselectedCustomerName");
+            localStorage.removeItem("FrmSlpselected");
+            localStorage.removeItem("FrmSlpselectedSlpName");
+            localStorage.removeItem("ToSlpselected");
+            localStorage.removeItem("ToSlpselectedSlpName");
+        }
+
+
+        function ExportReportToPDFOlder() {
+            // Fill values (from input fields or hardcoded for demo)
+            //$('#td').val($('#tdInput').val()); // Or hardcoded value
+            //$('#customerCode').val($('#customerInput').val());
+            //$('#salesPersonCode').val($('#salesPersonInput').val());
+
+            // Submit the form to trigger file download
+           
+
+            $('#LoadReportForm').submit();
+        }
+    function ExportReportToPDFOld() {
             debugger;
             var formData = $("#LoadReportForm").serialize();
 

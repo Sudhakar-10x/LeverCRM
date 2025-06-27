@@ -52,41 +52,41 @@
                 <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     @*<li class="@Html.IsSelected(controller: "SalesOrder")">
-                            <a href="@Url.Action("Index", "SalesOrder")">Sales Order List</a>
-                        </li>
-                        <li class="@Html.IsSelected(controller: "SalesOrder")">
-                            <a href="@Url.Action("Create", "SalesOrder")">New Sales Order</a>
-                        </li>
-                        <li class="@Html.IsSelected(controller: "SalesOrderUpload")">
-                            <a href="@Url.Action("Upload", "SalesOrderUpload")">Sales Order Upload</a>
-                        </li>
-                        <li class="@Html.IsSelected(controller: "Delivery")">
-                            <a href="@Url.Action("Create", "Delivery")">Delivery</a>
-                        </li>
-                        <li class="@Html.IsSelected(controller: "Invoice")">
-                            <a href="@Url.Action("InvoiceCreate", "Invoice")">Sales Invoice</a>
-                        </li>*@
+            <a href="@Url.Action("Index", "SalesOrder")">Sales Order List</a>
+        </li>
+        <li class="@Html.IsSelected(controller: "SalesOrder")">
+            <a href="@Url.Action("Create", "SalesOrder")">New Sales Order</a>
+        </li>
+        <li class="@Html.IsSelected(controller: "SalesOrderUpload")">
+            <a href="@Url.Action("Upload", "SalesOrderUpload")">Sales Order Upload</a>
+        </li>
+        <li class="@Html.IsSelected(controller: "Delivery")">
+            <a href="@Url.Action("Create", "Delivery")">Delivery</a>
+        </li>
+        <li class="@Html.IsSelected(controller: "Invoice")">
+            <a href="@Url.Action("InvoiceCreate", "Invoice")">Sales Invoice</a>
+        </li>*@
                     <li class="@Html.IsSelected(controller: "SalesOrder")">
                         <a href="@Url.Action("Index", "SalesOrder")">Sales Order</a>
                     </li>
                     @*<li class="@Html.IsSelected(controller: "SalesOrder")">
-                            <a href="@Url.Action("Create", "SalesOrder")">New Sales Order</a>
-                        </li>*@
+            <a href="@Url.Action("Create", "SalesOrder")">New Sales Order</a>
+        </li>*@
                     <li class="@Html.IsSelected(controller: "SalesOrderUpload")">
                         <a href="@Url.Action("Upload", "SalesOrderUpload")">Sales Order Upload</a>
                     </li>
                     @*<li class="@Html.IsSelected(controller: "Delivery")">
-                    <a href="@Url.Action("Index", "Delivery")">Delivery Document</a>
-                </li>*@
-                    <li class="@Html.IsSelected(controller: "Delivery")">
-                        <a href="@Url.Action("Create", "Delivery")">New Delivery</a>
-                    </li>
-                    <li class="@Html.IsSelected(controller: "CreditMemo")">
-                        <a href="@Url.Action("Index", "CreditMemo")">AR Credit Memo</a>
-                    </li>
+            <a href="@Url.Action("Index", "Delivery")">Delivery Document</a>
+        </li>*@
+                    @*<li class="@Html.IsSelected(controller: "Delivery")">
+            <a href="@Url.Action("Create", "Delivery")">Delivery</a>
+        </li>*@
                     <li class="@Html.IsSelected(controller: "Invoice")">
-                        <a href="@Url.Action("Index", "Invoice")">Sales Invoice</a>
+                        <a href="@Url.Action("Index", "Invoice")">AR Invoice</a>
                     </li>
+                    @*<li class="@Html.IsSelected(controller: "CreditMemo")">
+            <a href="@Url.Action("Index", "CreditMemo")">AR Credit Memo</a>
+        </li>*@
                 </ul>
             </li>
 
