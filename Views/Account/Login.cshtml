@@ -11,119 +11,153 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/animate.css" rel="stylesheet" />
     <link href="~/Content/style.css" rel="stylesheet" />
+    <style>
+        body.gray-bg {
+            background: #f5f7fa;
+        }
+
+        .login-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 30px 25px;
+            max-width: 400px;
+            margin: 50px auto;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+            transition: all .3s ease-in-out;
+        }
+
+            .login-card:hover {
+                box-shadow: 0px 6px 18px rgba(0,0,0,0.12);
+            }
+
+            .login-card h3 {
+                font-weight: 600;
+                margin-bottom: 15px;
+                color: #333;
+            }
+
+            .login-card p {
+                color: #666;
+                font-size: 14px;
+            }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .btn-custom {
+            background-color: #e91e63;
+            border-color: #e91e63;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+            .btn-custom:hover {
+                background-color: #c2185b;
+                border-color: #c2185b;
+            }
+
+        .logo {
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body class="gray-bg">
 
-    <div class="middle-box text-center loginscreen animated fadeInDown">
-        <div>
-            <div>
-                <h1 class="logo-name">10x</h1>
+    <div class="middle-box text-center animated fadeInDown">
+        <div class="login-card">
+            <div class="logo">
+                <img src="~/Content/Altamam.jpg" style="width: 130px;" alt="Logo" />
             </div>
-            <h3>Welcome to 10xPOS</h3>
+
+            <h3>Welcome to Sales Portal</h3>
             <p>Login to see it in action.</p>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
 
             @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "m-t", role = "form" }))
             {
                 @Html.AntiForgeryToken()
 
-                <div class="form-group">
+                <div class="form-group mb-3">
                     @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Username" })
                     @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
                 </div>
-                <div class="form-group">
+
+                <div class="form-group mb-3">
                     @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                 </div>
-                <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
 
-                <p class="text-muted text-center">
-                    <small>Forgot your password?</small>
+                <button type="submit" class="btn btn-primary block full-width m-b" style="background-color: #e91e63; border-color: #e91e63; ">Login</button>
+
+                <p class="text-muted text-center mt-3 mb-0">
+                    <small><a href="#">Forgot your password?</a></small>
                 </p>
             }
-
-            <p class="m-t">
-                <small>10xPOS &copy; @DateTime.Now.Year</small>
-            </p>
         </div>
     </div>
 
     <script src="~/Scripts/jquery-3.1.1.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
-
 </body>
 </html>
 
 
+@*<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <title>Login - 10xPOS</title>
+            <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+            <link href="~/Content/animate.css" rel="stylesheet" />
+            <link href="~/Content/style.css" rel="stylesheet" />
+        </head>
+        <body class="gray-bg">
 
-@*@{ Layout = null; }
-
-    <!DOCTYPE html>
-    <html>
-    <head>
-
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <title>INSPINIA | Login</title>
-
-        <link href="~/Content/bootstrap.min.css" rel="stylesheet">
-        <link href="~/Fonts/font-awesome/css/font-awesome.css" rel="stylesheet">
-
-        <link href="~/Content/animate.css" rel="stylesheet">
-        <link href="~/Content/style.css" rel="stylesheet">
-
-    </head>
-
-    <body class="gray-bg">
-
-        <div class="middle-box text-center loginscreen  animated fadeInDown">
-            <div>
+            <div class="middle-box text-center loginscreen animated fadeInDown">
                 <div>
+                    <div>
+    <h3 class="text-center text-heading mb-2">
+                        <img src="~/Content/Altamam.jpg" style="width: 130px;" /> <span class="text-pink app-brand-text demo text-heading fw-bold"></span>
 
-                    <h1 class="logo-name">IN+</h1>
-
+                    </h3>
                 </div>
-                <h3>Welcome to IN+</h3>
-                <p>
-                    Perfectly designed and precisely prepared admin theme with over 50 pages with extra new web app views.
-                </p>
-                <p>Login in. To see it in action.</p>
-                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                <h3>Welcome to Sales Portal</h3>
+                <p>Login to see it in action.</p>
+
+                @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "m-t", role = "form" }))
                 {
                     @Html.AntiForgeryToken()
-                    @Html.ValidationSummary(true)
+
                     <div class="form-group">
-                        @Html.LabelFor(m => m.UserName, new { @class = "col-md-3 control-label" })
-                        <div class="col-md-9">
-                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(m => m.UserName)
-                        </div>
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Username" })
+                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(m => m.Password, new { @class = "col-md-3 control-label" })
-                        <div class="col-md-9">
-                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(m => m.Password)
-                        </div>
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                     </div>
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-8">
-                            <div class="checkbox">
-                                @Html.CheckBoxFor(m => m.RememberMe)
-                                @Html.LabelFor(m => m.RememberMe)
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-8">
-                            <input type="submit" value="Log in" class="btn btn-primary" />
-                        </div>
-                    </div>}
+                    <button type="submit" class="btn btn-primary block full-width m-b" style="background-color: #e91e63; border-color: #e91e63; ">Login</button>
+
+                    <p class="text-muted text-center">
+                        <small>Forgot your password?</small>
+                    </p>
+                }
+
             </div>
         </div>
-    </body>
-    </html>
 
-    @section Scripts {
-        @Scripts.Render("~/bundles/jqueryval")
-    }*@
+        <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+        <script src="~/Scripts/bootstrap.min.js"></script>
+
+    </body>
+    </html>*@

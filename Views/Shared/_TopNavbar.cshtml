@@ -1,13 +1,41 @@
-﻿<div class="row border-bottom">
+﻿@*<div class="row border-bottom">
     <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
             <form role="search" class="navbar-form-custom" method="post" action="">
                 <div class="form-group">
-                    @*<input type="text" placeholder="Search for something..." class="form-control" name="top-search" id="top-search">*@
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold">Connected:</span>
+                        <span class="ms-2 text-uppercase">ALTAMAMUAE_TEST</span>
+                    </div>
+
+                    <input type="text" placeholder="Search for something..." class="form-control" name="top-search" id="top-search">
                 </div>
             </form>
         </div>
         @Html.Partial("_LoginPartial")
     </nav>
+</div>*@
+
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom:0">
+        <div class="navbar-header" >
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary" href="#" style="background-color: #e91e63">
+                <i class="fa fa-bars"></i>
+            </a>
+
+            <!-- Connected + Company (same line as the button) -->
+            <span class="navbar-text navbar-company">
+                Connected: <strong>@(Session["CompanyName"] ?? "")</strong>
+            </span>
+
+            <!-- If you keep the search form, make it inline so it doesn't push to a new line -->
+            <form role="search" class="navbar-form-custom navbar-form-inline" method="post" action="">
+                <div class="form-group"></div>
+            </form>
+        </div>
+
+        @Html.Partial("_LoginPartial")
+    </nav>
 </div>
+

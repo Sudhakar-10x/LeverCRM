@@ -1,42 +1,22 @@
 ﻿<nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
+
             <li class="nav-header">
-                <div class="dropdown profile-element">
-                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                        <span class="clear">
-                            <span class="block m-t-xs">
-                                <strong class="font-bold">@Session["CompanyName"]</strong>
-                            </span>
-                            <span class="block m-t-xs">
-                                <strong class="font-bold">@Session["UserName"]</strong>
-                            </span>
-                            <span class="text-muted text-xs block">Menu<b class="caret"></b></span>
-                        </span>
-                    </a>
-                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                        <li><a href="@Url.Action("Signout","Accounts")">Logout</a></li>
-                    </ul>
-                </div>
-                <div class="logo-element">
-                    IN+
+                <div class="profile-element text-center">
+                    <img src="~/Content/RoundLogoAL.png" alt="Logo" class="img-circle" style="width:60px; height:60px;" />
                 </div>
             </li>
-            @*<li class="@Html.IsSelected(action: "Index")">
-                <a href="@Url.Action("Index", "Home")"><i class="fa fa-laptop"></i> <span class="nav-label">Main page</span> </a>
-                </li>*@
-            @*<li class="@Html.IsSelected(action: "Minor")">
-                    <a href="@Url.Action("Index", "BusinessPartner")"><i class="fa fa-desktop"></i> <span class="nav-label">Business Master List</span></a>
-                </li>
-                <li class="@Html.IsSelected(action: "Minor")">
-                    <a href="@Url.Action("Index", "Product")"><i class="fa fa-desktop"></i> <span class="nav-label">Product Details</span></a>
-                </li>
-                <li class="@Html.IsSelected(action: "Minor")">
-                    <a href="@Url.Action("Create", "SalesOrder")"><i class="fa fa-desktop"></i> <span class="nav-label">Sales Order</span></a>
-                </li>*@
 
-            <!-- Masters Folder -->
-            <li>
+            <li class="@(Html.IsSelected(controller: "Home") == "active" ? "active" : "")">
+                <a href=@Url.Action("Index","Home") class="fa fa-dashboard">
+                    <i class="fa fa-tachometer-alt"></i>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+            </li>
+
+
+            @*<li class="@(Html.IsSelected(controller: "Product") == "active" || Html.IsSelected(controller: "BusinessPartner") == "active" ? "active" : "")">
                 <a href="#"><i class="fa fa-database"></i> <span class="nav-label">Masters</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li class="@Html.IsSelected(controller: "Product")">
@@ -47,67 +27,112 @@
                     </li>
                 </ul>
             </li>
-            <!-- Sales Folder -->
-            <li>
+
+            <li class="@(Html.IsSelected(controller: "SalesQuotation") == "active" ? "active" : "")">
                 <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    @*<li class="@Html.IsSelected(controller: "SalesOrder")">
-            <a href="@Url.Action("Index", "SalesOrder")">Sales Order List</a>
-        </li>
-        <li class="@Html.IsSelected(controller: "SalesOrder")">
-            <a href="@Url.Action("Create", "SalesOrder")">New Sales Order</a>
-        </li>
-        <li class="@Html.IsSelected(controller: "SalesOrderUpload")">
-            <a href="@Url.Action("Upload", "SalesOrderUpload")">Sales Order Upload</a>
-        </li>
-        <li class="@Html.IsSelected(controller: "Delivery")">
-            <a href="@Url.Action("Create", "Delivery")">Delivery</a>
-        </li>
-        <li class="@Html.IsSelected(controller: "Invoice")">
-            <a href="@Url.Action("InvoiceCreate", "Invoice")">Sales Invoice</a>
-        </li>*@
-                    <li class="@Html.IsSelected(controller: "SalesOrder")">
-                        <a href="@Url.Action("Index", "SalesOrder")">Sales Order</a>
+                    <li class="@Html.IsSelected(controller: "SalesQuotation")">
+                        <a href="@Url.Action("Index", "SalesQuotation")">Sales Quotation</a>
                     </li>
-                    @*<li class="@Html.IsSelected(controller: "SalesOrder")">
-            <a href="@Url.Action("Create", "SalesOrder")">New Sales Order</a>
-        </li>*@
-                    <li class="@Html.IsSelected(controller: "SalesOrderUpload")">
-                        <a href="@Url.Action("Upload", "SalesOrderUpload")">Sales Order Upload</a>
-                    </li>
-                    @*<li class="@Html.IsSelected(controller: "Delivery")">
-            <a href="@Url.Action("Index", "Delivery")">Delivery Document</a>
-        </li>*@
-                    @*<li class="@Html.IsSelected(controller: "Delivery")">
-            <a href="@Url.Action("Create", "Delivery")">Delivery</a>
-        </li>*@
-                    <li class="@Html.IsSelected(controller: "Invoice")">
-                        <a href="@Url.Action("Index", "Invoice")">AR Invoice</a>
-                    </li>
-                    @*<li class="@Html.IsSelected(controller: "CreditMemo")">
-            <a href="@Url.Action("Index", "CreditMemo")">AR Credit Memo</a>
-        </li>*@
                 </ul>
             </li>
 
-            <!--Purchase Folder-->
-            <li>
-                <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Purchase</span> <span class="fa arrow"></span></a>
+            <li class="@(Html.IsSelected(controller: "Report") == "active" ? "active" : "")">
+                <a href="#"><i class="fa fa-shopping-bag"></i> <span class="nav-label">Reports</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="@Html.IsSelected(controller: "PurchaseOrder")">
-                        <a href="@Url.Action("Index", "Purchase")">Purchase Order</a>
+                    <li class="@Html.IsSelected(controller: "Report")">
+                        <a href="@Url.Action("Index", "Report")">Item Availability</a>
                     </li>
+                </ul>
+            </li>*@
 
-                </ul>
-            </li>
-            <li>
-                <a href="#"><i class="fa fa-database"></i> <span class="nav-label">Reports</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li class="@Html.IsSelected(controller: "OutStanding")">
-                        <a href="@Url.Action("Index", "OutStanding")">Customer Outstanding Report</a>
-                    </li>
-                </ul>
-            </li>
         </ul>
     </div>
 </nav>
+
+<!-- CSS for Active State -->
+<style>
+    /* 🔴 Main menu active highlight */
+    .nav > li.active > a {
+        background-color: #e91e63 !important; /* red highlight */
+        color: #fff !important;
+        font-weight: bold;
+    }
+
+    /* Submenu default */
+    .nav-second-level > li > a {
+        position: relative;
+        padding-left: 25px;
+        color: #bbb !important; /* light gray default */
+        display: block;
+        transition: all 0.3s ease;
+    }
+
+        /* Dot for submenu */
+        .nav-second-level > li > a::before {
+            content: "•";
+            color: #999;
+            position: absolute;
+            left: 10px;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+    /* ✅ Active submenu (NO background, just text highlight) */
+    .nav-second-level > li.active > a {
+        font-weight: bold;
+        color: #e91e63 !important; /* red text for active submenu */
+        background: none !important; /* ❌ remove red background */
+    }
+
+        /* 🔴 Active submenu dot */
+        .nav-second-level > li.active > a::before {
+            color: #e91e63; /* red dot */
+        }
+
+    /* Hover effect */
+    .nav-second-level > li > a:hover {
+        color: #fff !important;
+        background: none !important; /* ❌ no background */
+        text-decoration: underline; /* subtle hover effect */
+    }
+</style>
+
+
+
+@*<nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+
+                <li class="nav-header">
+                    <div class="profile-element text-center">
+                        <img src="~/Content/10X_Round.png" alt="Logo" class="img-circle" style="width:60px; height:60px;" />
+                    </div>
+                </li>
+
+
+                <li>
+                    <a href="#"><i class="fa fa-database"></i> <span class="nav-label">Masters</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li class="@Html.IsSelected(controller: "Product")">
+                            <a href="@Url.Action("Index", "Product")">Product Details</a>
+                        </li>
+                        <li class="@Html.IsSelected(controller: "BusinessPartner")">
+                            <a href="@Url.Action("Index", "BusinessPartner")">Business Master List</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li class="@Html.IsSelected(controller: "SalesQuotation")">
+                            <a href="@Url.Action("Index", "SalesQuotation")">Sales Quotation</a>
+                        </li>
+
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+    </nav>*@

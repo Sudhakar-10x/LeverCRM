@@ -1,71 +1,158 @@
 ﻿
 @model _10xErp.Models.ItemDetails
-    @{
-        Layout = null;
-    }
+@{
+    Layout = null;
+}
 
-<tr class="row-address">    
-    <td>
-        <select class="form-control item-dropdown" name="ItemDetailsListView[@Model.Index].ItemCode" data-selected-value="@Model.ItemCode">
-            @if (!string.IsNullOrEmpty(Model.ItemCode))
-            {
-                <option value="@Model.ItemCode" selected="selected">@Model.ItemName</option>
-            }
-            else
-            {
-                <option value="">-- Select Item --</option>
-            }
-        </select>
-        <input type="hidden" name="ItemDetailsListView[@Model.Index].ItemName" value="@Model.ItemName" class="item-name" />
+<tr class="row-address">
+    <td hidden>
+        <input type="number" step="any"
+               name="ItemDetailsListView[@Model.Index].LineNum"
+               class="form-control form-control-sm line-num"
+               value="@(Model.LineNum >= 0 ? Model.LineNum.ToString() : "-1")" />
+
+        <input type="text"
+               name="ItemDetailsListView[@Model.Index].lineNo"
+               class="form-control form-control-sm line-no"
+               value="@(String.IsNullOrEmpty(Model.lineNo) ? "" : Model.lineNo)" />
     </td>
+
+    @*<td>
+        <input type="number" step="any" name="ItemDetailsListView[@Model.Index].LineNum" class="form-control form-control-sm" value="@Model.LineNum" />
+        <input type="number" step="any" name="ItemDetailsListView[@Model.Index].lineNo" class="form-control form-control-sm" value="@Model.lineNo" />
+    </td>*@
+<td hidden>
+    <input type="text" name="ItemDetailsListView[@Model.Index].IsChanged"
+           class="is-dirty" value="@(Model.IsChanged ? "false" : "true")" />
+    @*<input type="text" name="ItemDetailsListView[@Model.Index].IsChanged"
+           class="is-dirty" value="false" />*@
+
+</td>
+
+    @*<td hidden>
+            <input type="number" step="any" name="ItemDetailsListView[@Model.Index].LineNum" class="form-control form-control-sm" value="@(Model.LineNum >= 0 ? Model.LineNum : -1)" />
+        </td>*@
     <td>
+        <select class="form-select form-select-sm fw-semibold border-primary rounded-2 type-select"
+                name="ItemDetailsListView[@Model.Index].Type"
+                style="min-width: 100px;height:30px;">
+            <option value="Regular" @(Model.Type == "Regular" ? "selected" : "")>🛒 Regular</option>
+            <option value="Text" @(Model.Type == "Text" ? "selected" : "")>📝 Text</option>
+        </select>
+    </td>
+
+    <td class="text-input-cell" colspan="13" style="display: none;">
+        <input type="text" class="form-control" name="ItemDetailsListView[@Model.Index].TextDescription" value="@Model.TextDescription" placeholder="Enter text here..." />
+    </td>
+
+    <!-- Regular Fields -->
+    <td class="text-cell">
+        <input type="text"
+               class="form-control form-control-sm item-autocomplete"
+               name="ItemDetailsListView[@Model.Index].ItemName"
+               value="@Model.ItemName"
+               placeholder="Search item..." autocomplete="off" style="min-width: 380px;" />
+        <input type="hidden"
+               name="ItemDetailsListView[@Model.Index].ItemName"
+               class="item-name"
+               value="@Model.ItemName" />
+
+    </td>
+    @*<td>
+            <div class="input-group">
+                <input type="text"
+                       class="form-control item-desc"
+                       name="ItemDetailsListView[@Model.Index].ItemName"
+                       value="@Model.ItemName"
+                       readonly
+                       placeholder="Search Item..." />
+                <button type="button"
+                        class="btn btn-outline-secondary btn-cfl-item"
+                        data-index="@Model.Index">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </td>*@
+
+    <td class="text-cell">
         <input type="text" name="ItemDetailsListView[@Model.Index].ItemCode" readonly class="form-control form-control-sm" value="@Model.ItemCode" />
         @Html.ValidationMessage($"ItemDetailsListView[{Model.Index}].ItemCode", "", new { @class = "text-danger" })
     </td>
-    <td>
-        <input type="hidden" name="ItemDetailsListView[@Model.Index].UomEntry" value="@Model.UomEntry" class="UomEntry" />
-        <select name="ItemDetailsListView[@Model.Index].UomName" class="form-control uom-dropdown" readonly></select>
-    </td>
-    <td>
+    <td class="text-cell">
         <input type="number" step="any" name="ItemDetailsListView[@Model.Index].Qty" class="form-control form-control-sm" value="@Model.Qty" />
-        @Html.ValidationMessage($"ItemDetailsListView[{Model.Index}].Qty", "", new { @class = "text-danger" })
     </td>
-    <td>
-        <select name="ItemDetailsListView[@Model.Index].foc" class="form-control foc-dropdown"></select>
-    </td>
-    <td>
-        <input type="text" name="ItemDetailsListView[@Model.Index].focremarks" class="form-control form-control-sm focremarks-textbox" readonly value="@Model.focremarks" />
-    </td>
-    <td>
+    <td class="text-cell">
         <input type="number" step="any" name="ItemDetailsListView[@Model.Index].Price" class="form-control form-control-sm" value="@Model.Price" />
         <input type="hidden" class="original-price" name="ItemDetailsListView[@Model.Index].OriginalPrice" value="@Model.OriginalPrice" />
-        @Html.ValidationMessage($"ItemDetailsListView[{Model.Index}].Price", "", new { @class = "text-danger" })
     </td>
-    <td>
+    <td class="text-cell">
         <input type="number" step="any" name="ItemDetailsListView[@Model.Index].DisPer" class="form-control form-control-sm" value="@Model.DisPer" />
     </td>
-    <td>
-        <select name="ItemDetailsListView[@Model.Index].VatGrpCode" class="form-control vatgroup-dropdown"></select>
+    <td class="text-cell">
+        <select name="ItemDetailsListView[@Model.Index].VatGrpCode" class="form-control vatgroup-dropdown">
+            @if (Model.lstVAT != null && Model.lstVAT.Count > 0)
+            {
+                foreach (var vat in Model.lstVAT)
+                {
+                    <option value="@vat.VATCode" @(Model.VatGrpCode == vat.VATCode ? "selected" : "")>@vat.VATName</option>
+                }
+            }
+        </select>
+
     </td>
-    <td>
+    <td class="text-cell">
         <input type="text" name="ItemDetailsListView[@Model.Index].VAT" class="form-control form-control-sm vat-textbox" readonly value="@Model.VAT" />
     </td>
-    <td hidden>
-        <input type="number" step="any" name="ItemDetailsListView[@Model.Index].VatRate" class="form-control form-control-sm vat-textbox" readonly value="@Model.VatRate" />
-    </td>
-    <td>
+    @*<td class="text-cell" hidden>
+            <input type="number" step="any" name="ItemDetailsListView[@Model.Index].VatRate" class="form-control form-control-sm vat-textbox" readonly value="@Model.VatRate" />
+        </td>*@
+    <td class="text-cell">
         <input type="text" name="ItemDetailsListView[@Model.Index].LineTotal" class="form-control form-control-sm" value="@Model.LineTotal" />
     </td>
-    <td>
-        <select name="ItemDetailsListView[@Model.Index].Warehouse" class="form-control warehouse-dropdown"></select>
+    <td class="text-cell">
+        <input type="text" name="ItemDetailsListView[@Model.Index].GrossPriceAfterDiscount" class="form-control form-control-sm" value="@Model.GrossPriceAfterDiscount" />
     </td>
-    <td>
-        <input type="text" name="ItemDetailsListView[@Model.Index].WhInstockQty" class="form-control form-control-sm WhInstockQty-textbox" readonly value="@Model.WhInstockQty" />
+
+    <td class="text-cell">
+        <input type="hidden" name="ItemDetailsListView[@Model.Index].UomEntry" value="@Model.UomEntry" class="UomEntry" />
+        <select name="ItemDetailsListView[@Model.Index].UomName" class="form-control uom-dropdown" readonly>
+            @if (Model.lstUomDetails != null && Model.lstUomDetails.Count > 0)
+            {
+                foreach (var uom in Model.lstUomDetails)
+                {
+                    <option value="@uom.UomName" @(Model.UomName == uom.UomName ? "selected" : "")>@uom.UomName</option>
+                }
+            }
+        </select>
     </td>
+
+    <td class="text-cell">
+        <select name="ItemDetailsListView[@Model.Index].Warehouse" class="form-control warehouse-dropdown">
+            @if (Model.lstWarehouse != null && Model.lstWarehouse.Count > 0)
+            {
+                foreach (var uom in Model.lstWarehouse)
+                {
+                    <option value="@uom.WhsCode" @(Model.Warehouse == uom.WhsCode ? "selected" : "")>@uom.WhsName</option>
+                }
+            }
+        </select>
+    </td>
+
+    <td class="text-cell">
+        <input type="text" step="any" name="ItemDetailsListView[@Model.Index].FreeText" class="form-control form-control-sm" style="width: 300px;" value="@Model.FreeText" />
+    </td>
+
+    <td class="text-cell">
+        <input type="text" step="any" name="ItemDetailsListView[@Model.Index].Remarks" class="form-control form-control-sm" style="width: 150px;" value="@Model.Remarks" />
+    </td>
+
     <td style="text-align: center;">
+        <button type="button" class="btn btn-sm btn-primary insertAbove">+</button>
+        @*<button type="button" class="btn btn-sm btn-secondary insertBelow">Insert Below</button>*@
         <button type="button" class="btn btn-sm btn-danger delete-row">X</button>
     </td>
 </tr>
+
 
 
 

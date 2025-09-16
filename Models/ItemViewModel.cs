@@ -20,7 +20,11 @@ namespace _10xErp.Models
 
     public class ItemDetails
     {
-        [Required(ErrorMessage = "Item Code is required")]
+        public int LineNum { get; set; }
+        public string Type { get; set; }
+        public string TextDescription { get; set; }
+
+        //[Required(ErrorMessage = "Item Code is required")]
         public string ItemCode { get; set; }
 
         public string ItemName { get; set; }
@@ -76,6 +80,7 @@ namespace _10xErp.Models
         public string BinCode { get; set; }
         public decimal? Qty { get; set; }
         public decimal LineTotal { get; set; }
+        public decimal GrossPriceAfterDiscount { get; set; }
         public decimal VAT { get; set; }
         public double? VatRate { get; set; }
         public string VatGrpCode { get; set; }
@@ -83,10 +88,15 @@ namespace _10xErp.Models
         public decimal? OverallAvlQty { get; set; }
         public string DocEntry { get; set; }
         public string lineNo { get; set; }
+        public bool IsChanged { get; set; }
 
         public string foc { get; set; }
         public string focremarks { get; set; }
+
+        public string FreeText { get; set; }
+        public string Remarks { get; set; }
         public string Warehouse { get; set; }
+        public string UomCodes { get; set; }
         //[NotMapped]
         public int Index { get; set; } 
 
@@ -106,6 +116,8 @@ namespace _10xErp.Models
         //public List<BatchDetails> lstBatchdetails { get; set; }
 
     }
+
+
     public class BatchDetails
     {
         public string BatchNum { get; set; }
@@ -145,6 +157,17 @@ namespace _10xErp.Models
         public string CostCenterName { get; set; }
     }
 
+    public class WarehouseViewModel
+    {
+        public string WhseCode { get; set; }
+
+        public string WhseName { get; set; }
+
+        public int? BranchID { get; set; }
+
+        public bool IsBinEnabled { get; set; }
+
+    }
     public class VATModel
     {
         public string VATCode { get; set; }
@@ -245,4 +268,10 @@ namespace _10xErp.Models
         public string FOC { get; set; }
         public string FOCRemarks { get; set; }
     }
+    public class DNPrintResponse
+    {
+        public bool IsSucess { get; set; }
+        public string CnfsMsg { get; set; }
+    }
+
 }

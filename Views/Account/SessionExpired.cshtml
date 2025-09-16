@@ -1,0 +1,42 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Session Expired</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        h2 {
+            color: #cc0000;
+        }
+
+        a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+    <h2>Your session has expired due to inactivity.</h2>
+    <p>Please <a href="@Url.Action("Login", "Account")">log in again</a>.</p>
+</body>
+</html>
+
+
+
+

@@ -21,11 +21,16 @@ namespace __10xErp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            SalesOrderController objNew = new SalesOrderController();
-            ServiceLayerServices currentOdataService = objNew.MainLoginLogoutAction(true);
-            System.Web.HttpContext.Current.Application.Lock();
-            System.Web.HttpContext.Current.Application["sapAppGlobal"] = currentOdataService;
-            System.Web.HttpContext.Current.Application.UnLock();
+            //SalesOrderController objNew = new SalesOrderController();
+            //ServiceLayerServices currentOdataService = objNew.MainLoginLogoutAction(true);
+            //System.Web.HttpContext.Current.Application.Lock();
+            //System.Web.HttpContext.Current.Application["sapAppGlobal"] = currentOdataService;
+            //System.Web.HttpContext.Current.Application.UnLock();
         }
+        protected void Session_Start(Object sender, EventArgs e)
+        {
+            Session.Timeout = 120; // in minutes
+        }
+
     }
 }

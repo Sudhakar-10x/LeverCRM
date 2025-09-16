@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     @*<link rel="stylesheet" href="@Url.Content("~/font-awesome/css")"
         integrity="sha512-MZ5b...your_hash_here..." crossorigin="anonymous" referrerpolicy="no-referrer" />*@
+
 </head>
 <body>
 
@@ -57,6 +58,53 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+    // Set session timeout (in milliseconds, 20 minutes = 1200000 ms)
+    var sessionTimeout = 1200000; // 20 minutes
+    var warningBefore = 60000;    // Show warning 1 minute before expiry
+    var timeoutWarning;
+
+    // Start countdown on page load
+    resetSessionTimeout();
+
+    function resetSessionTimeout() {
+        clearTimeout(timeoutWarning);
+        timeoutWarning = setTimeout(showTimeoutWarning, sessionTimeout - warningBefore);
+    }
+
+    function showTimeoutWarning() {
+        Swal.fire({
+            title: 'Session Expiring Soon',
+            text: "Your session will expire in 1 minute due to inactivity. Do you want to stay logged in?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Stay Logged In',
+            cancelButtonText: 'Log Out'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // User wants to stay logged in
+                keepSessionAlive();
+                resetSessionTimeout();
+            } else {
+                // User wants to log out
+                window.location.href = '@Url.Action("Logout", "Account")';
+            }
+        });
+    }
+
+    function keepSessionAlive() {
+        $.get('@Url.Action("KeepAlive", "Account")');
+    }
+
+    // Reset session timeout on any user interaction
+    $(document).on('mousemove keydown click', function () {
+        resetSessionTimeout();
+    });
+    </script>
+
 
     @*@Scripts.Render("~/bundles/jquery")*@
     @Scripts.Render("~/bundles/bootstrap")

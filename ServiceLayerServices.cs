@@ -30,6 +30,9 @@ using _10xErp.ServiceReferenceLayer;
 using _10xErp.ServiceReferenceLayer.SAPB1;
 using System.Data;
 using _10xErp.Helpers;
+using System.Net.Http;
+using System.Configuration;
+using System.Net.Http.Headers;
 
 namespace _10xErp
 {
@@ -675,6 +678,14 @@ namespace _10xErp
             return order;
         }
 
+        public Document GetSalesQuotationDetails(int docEntry)
+        {
+            Document order = currentServiceContainer.Quotations
+                                  .Where(o => o.DocEntry == docEntry)
+                                  .SingleOrDefault();
+            return order;
+        }
+
         public Document GetSalesInvoices(int docEntry)
         {
             Document oInvoice = currentServiceContainer.Invoices
@@ -844,7 +855,7 @@ namespace _10xErp
         }
         public decimal GetTotalSum(int DocEntry)
         {
-            Document order = currentServiceContainer.Drafts
+            Document order = currentServiceContainer.Quotations
                                   .Where(o => o.DocEntry == DocEntry)
                                   .SingleOrDefault();
 
@@ -898,7 +909,7 @@ namespace _10xErp
         }
         public decimal GetTotalDiscSum(int DocEntry)
         {
-            Document order = currentServiceContainer.Drafts
+            Document order = currentServiceContainer.Quotations
                                   .Where(o => o.DocEntry == DocEntry)
                                   .SingleOrDefault();
 
@@ -2115,6 +2126,179 @@ namespace _10xErp
 
             return newDoc;
         }
+
+        public Document UpdateSalesQuotation2(Document updatedDoc)
+        {
+            Document updatedResult = null;
+
+            try
+            {
+                // Attach the document to the context and mark it as modified
+                currentServiceContainer.AttachTo("Quotations", updatedDoc);
+                currentServiceContainer.UpdateObject(updatedDoc);
+
+                // Save changes to the service
+                DataServiceResponse response = currentServiceContainer.SaveChanges();
+
+                if (response != null)
+                {
+                    ChangeOperationResponse opRes = (ChangeOperationResponse)response.SingleOrDefault();
+                    object retObj = ((System.Data.Services.Client.EntityDescriptor)(opRes.Descriptor)).Entity;
+                    if (retObj != null)
+                    {
+                        updatedResult = (Document)retObj;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                currentServiceContainer.Detach(updatedDoc);
+                throw ex;
+            }
+
+            return updatedResult;
+        }
+
+        public Document UpdateSalesQuotation(Document updatedDoc)
+        {
+            Document updatedResult = null;
+
+            try
+            {
+
+                //var linesToUpdate = updatedDoc.DocumentLines.Where(l => l.LineNum == -1).ToList();
+                //updatedDoc.DocumentLines = linesToUpdate;
+
+            //    updatedDoc.DocumentLines = updatedDoc.DocumentLines
+            //.Where(l => l.LineNum < 0 || l.IsModified == true)
+            //.ToList();
+
+
+                // Attach the document to the context
+                currentServiceContainer.AttachTo("Quotations", updatedDoc);
+                currentServiceContainer.UpdateObject(updatedDoc);
+
+                // Force PATCH instead of PUT
+                DataServiceResponse response = currentServiceContainer.SaveChanges(
+                    SaveChangesOptions.PatchOnUpdate
+                );
+
+                if (response != null)
+                {
+                    ChangeOperationResponse opRes = (ChangeOperationResponse)response.SingleOrDefault();
+                    if (opRes != null)
+                    {
+                        var entityDescriptor = (System.Data.Services.Client.EntityDescriptor)opRes.Descriptor;
+                        if (entityDescriptor != null && entityDescriptor.Entity is Document doc)
+                        {
+                            updatedResult = doc;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Detach the entity to avoid context corruption
+                currentServiceContainer.Detach(updatedDoc);
+                throw;
+            }
+
+            return updatedResult;
+        }
+
+
+        // Load one quotation with its lines (for diffing)
+        public Document GetQuotationWithLines2(int docEntry)
+        {
+            // Make sure your proxy/container is initialized
+            var q = currentServiceContainer
+                .CreateQuery<Document>("Quotations")
+                .AddQueryOption("$filter", $"DocEntry eq {docEntry}")
+                .AddQueryOption("$expand", "DocumentLines,DocumentSpecialLines")
+                .ToList()
+                .FirstOrDefault();
+
+            return q;
+        }
+
+
+        public Document GetQuotationWithLines(int docEntry)
+        {
+            try
+            {
+                // Fetch document header + lines + special lines in one call
+                var quotation = currentServiceContainer
+                    .CreateQuery<Document>("Quotations")
+                    .Where(q => q.DocEntry == docEntry)
+                    .FirstOrDefault();
+
+                // At this point, DocumentLines and DocumentSpecialLines
+                // are already filled from the JSON payload.
+                return quotation;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Failed to load quotation {docEntry}", ex);
+            }
+        }
+
+        public async Task<Document> GetQuotationWithLinesAsync(int docEntry)
+        {
+            string baseUrl = ConfigurationManager.AppSettings["CurrentServiceURL"];
+            string serviceUrl = $"{baseUrl}/Quotations({docEntry})?$expand=DocumentLines,DocumentSpecialLines";
+
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
+
+                // Add BOTH cookies from login
+                string cookies = $"B1SESSION={strCurrentSessionGUID}; ROUTEID={strCurrentRouteIDString}";
+                client.DefaultRequestHeaders.Add("Cookie", cookies);
+
+                HttpResponseMessage response = await client.GetAsync(serviceUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new ApplicationException(
+                        $"Failed to get quotation {docEntry}: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}"
+                    );
+                }
+
+                string json = await response.Content.ReadAsStringAsync();
+                var quotation = JsonConvert.DeserializeObject<Document>(json);
+                return quotation;
+            }
+        }
+
+
+
+
+        // Strict PATCH update (no duplicates)
+        public Document UpdateSalesQuotationPatch(Document patchDoc)
+        {
+            try
+            {
+                // Attach & mark modified
+                currentServiceContainer.AttachTo("Quotations", patchDoc);
+                currentServiceContainer.UpdateObject(patchDoc);
+
+                // CRITICAL: PatchOnUpdate so only provided props are sent.
+                var resp = currentServiceContainer.SaveChanges(SaveChangesOptions.PatchOnUpdate);
+
+                // (optional) pull the updated entity back if you need it
+                var opRes = (ChangeOperationResponse)resp.SingleOrDefault();
+                var retObj = ((System.Data.Services.Client.EntityDescriptor)(opRes.Descriptor)).Entity;
+                return (Document)retObj;
+            }
+            catch
+            {
+                currentServiceContainer.Detach(patchDoc);
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// Get a Pick List Items
