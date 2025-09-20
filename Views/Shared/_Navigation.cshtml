@@ -16,26 +16,23 @@
             </li>
 
 
-            @*<li class="@(Html.IsSelected(controller: "Product") == "active" || Html.IsSelected(controller: "BusinessPartner") == "active" ? "active" : "")">
-                <a href="#"><i class="fa fa-database"></i> <span class="nav-label">Masters</span> <span class="fa arrow"></span></a>
+            <li class="@(Html.IsSelected(controller: "Activity") == "active" ? "active" : "")">
+                <a href="#"><i class="fa fa-database"></i> <span class="nav-label">Activity</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="@Html.IsSelected(controller: "Product")">
-                        <a href="@Url.Action("Index", "Product")">Product Details</a>
-                    </li>
-                    <li class="@Html.IsSelected(controller: "BusinessPartner")">
-                        <a href="@Url.Action("Index", "BusinessPartner")">Business Master List</a>
+                    <li class="@Html.IsSelected(controller: "Activity")">
+                        <a href="@Url.Action("Index", "Activity")">Activity List</a>
                     </li>
                 </ul>
             </li>
 
-            <li class="@(Html.IsSelected(controller: "SalesQuotation") == "active" ? "active" : "")">
+           @* <li class="@(Html.IsSelected(controller: "SalesQuotation") == "active" ? "active" : "")">
                 <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li class="@Html.IsSelected(controller: "SalesQuotation")">
                         <a href="@Url.Action("Index", "SalesQuotation")">Sales Quotation</a>
                     </li>
                 </ul>
-            </li>
+            </li> 
 
             <li class="@(Html.IsSelected(controller: "Report") == "active" ? "active" : "")">
                 <a href="#"><i class="fa fa-shopping-bag"></i> <span class="nav-label">Reports</span> <span class="fa arrow"></span></a>
@@ -44,7 +41,7 @@
                         <a href="@Url.Action("Index", "Report")">Item Availability</a>
                     </li>
                 </ul>
-            </li>*@
+            </li> *@
 
         </ul>
     </div>

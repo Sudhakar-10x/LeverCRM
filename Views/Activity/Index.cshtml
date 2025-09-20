@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "Activities List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="text-primary mb-3">📅 Activity List (Last 30 Days)</h3>
+
+    <table id="activityTable" class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Activity ID</th>
+                <th>Date</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Customer Code</th>
+                <th>SubjectCode</th>
+                <th>Details</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Sales Employee</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <!-- jQuery must be loaded first -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- MetisMenu compatible with IE -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.7.9/metisMenu.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.7.9/metisMenu.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#side-menu').metisMenu();
+        });
+    </script>
+
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+    <script>
+        $(document).ready(function () {
+            $('#activityTable').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("GetActivityList", "Activity")",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "ActivityID" },
+                    {
+                        "data": "Date",
+                        "render": function (data) {
+                            if (data && data !== 'null') {
+                                // Show date and time from DB correctly
+                                var dt = new Date(data);
+                                return dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+                            } else {
+                                return '—';
+                            }
+                        }
+                    },
+                    { "data": "Start" },
+                    { "data": "End" },
+                    { "data": "CustomerCode" },
+                    { "data": "SubjectCode" },
+                    { "data": "Details" },
+                    { "data": "Type" },
+                    { "data": "Status" },
+                    { "data": "SalesEmployee" }
+                ],
+                "responsive": true,
+                "language": {
+                    "emptyTable": "🚫 No activities found in the last 30 days"
+                }
+            });
+        });
+    </script>
+}
